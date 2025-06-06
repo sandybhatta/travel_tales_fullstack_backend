@@ -37,11 +37,11 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
     location: {
-        city: String,
-        state: String,
-        country: String,
-        required:true,
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        country: { type: String, required: true },
     },
+    
 
     // 🧑‍🤝‍🧑 Followers / Following
     followers: [
@@ -51,6 +51,12 @@ const userSchema = new mongoose.Schema(
       },
     ],
     following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    closeFriends: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
