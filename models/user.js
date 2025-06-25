@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import crypto from "crypto";
+import bcrypt from "bcrypt"
 
 const userSchema = new mongoose.Schema(
   {
@@ -115,15 +116,37 @@ const userSchema = new mongoose.Schema(
 
     // Optional expiry (ISO date). TTL index removes stale docs automatically.
     emailVerifyTokenExpires: Date,
+    
+    
     isBanned: {
       type: Boolean,
       default: false,
+    },
+
+    isDeactivated: {
+      type: Boolean,
+      default: false,
+    },
+    deactivationReason:{
+      type:String,
+      
     },
   },
   {
     timestamps: true, 
   }
 );
+
+
+// indexing for frequest search
+userSchema.index({ username: 1 });
+userSchema.index({ email: 1 });
+userSchema.index({ followers: 1 });
+userSchema.index({ following: 1 });
+
+
+
+
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next(); // only hash if password is changed
     const salt = await bcrypt.genSalt(10);

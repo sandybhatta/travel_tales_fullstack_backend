@@ -28,10 +28,17 @@ if(!email){
         return res.status(200).send({message:"Email is already verified"})
     }
 
+    if(existingUser.isDeactivated){
+        return res.status(403).send({message:"User is deactivated"})
+    }
+
+    if(existingUser.isBanned){
+        return res.status(403).send({message:"User is Banned from TravelTales"})
+    }
     //if user is found and the expiry didnt passed then wait
 
     if(existingUser.emailVerifyTokenExpires && existingUser.emailVerifyTokenExpires >Date.now()){
-        return res.status(200).send({message:"Please wait for the previous verification link to expire."})
+        return res.status(200).send({message:"Please wait 30 minutes for the previous verification link to expire."})
     }
     const rawToken = existingUser.createEmailVerificationToken();
     await existingUser.save(); // Save updated token
