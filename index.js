@@ -4,8 +4,8 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { connectDb } from "./config/db.js";
-// import authRoutes from "./routes/authroutes.js"
-// import nodemailer from "nodemailer"
+import authRoutes from "./routes/authroutes.js"
+import userRoutes from "./routes/userRoutes.js"
 dotenv.config();
 
 
@@ -68,6 +68,8 @@ app.get("/", (req, res) => {
 
 
 app.use("/api/auth", authRoutes);
+
+app.use("/api/user",userRoutes)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

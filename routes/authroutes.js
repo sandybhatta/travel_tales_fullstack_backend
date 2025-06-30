@@ -8,15 +8,16 @@ import {
   forgetPassword,
   resetPassword,
   changePassword,
-  deactivateUser
-} from "../controllers/authController.js";
+  deactivateUser,
+  reactivateUser
+} from "../Controllers/auth.controllers/authController.js";
 
-import {verifyOtpLogin} from "../controllers/verifyOTPLogin.js";
+import {verifyOtpLogin} from "../Controllers/auth.controllers/verifyOTPLogin.js";
 
-import {verifyEmail} from "../controllers/verificationEmailApi.js"
+import {verifyEmail} from "../Controllers/auth.controllers/verificationEmailApi.js"
 
-import resendVerification from "../controllers/resendVerification.js";
-import {resendOtp} from "../controllers/resendOtp.js";
+import resendVerification from "../Controllers/auth.controllers/resendVerification.js";
+import {resendOtp} from "../Controllers/auth.controllers/resendOtp.js";
 
 // imported express-validator
 import {body} from "express-validator";
@@ -37,7 +38,7 @@ router.post("/register",[
     .withMessage("Username must be at least 3 characters long")
     .notEmpty()
     .withMessage("Username is required"),
-    body("password").isLength({ min: 6 }).withMessage("Password must be at least 6 characters long"),
+    
 ], registeruser); // + validateRegister
 
 
@@ -96,6 +97,8 @@ router.post("/change-password", protect,changePassword )
 
 
 router.post("/deactivate-user",protect, deactivateUser)
+
+router.post("/reactivate-user", reactivateUser)
 
 
 router.get("/me", protect, getUserInfo);
