@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    resgistersAt:Date,
     pendingEmail: {
       type: String,
       trim: true,
@@ -65,6 +66,7 @@ const userSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+
     closeFriends: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -148,7 +150,7 @@ const userSchema = new mongoose.Schema(
     privacy: {
       profileVisibility: {
         type: String,
-        enum: ["public", "followers", "private"],
+        enum: ["public", "followers", "private","close_friends"],
         default: "public",
       },
       allowComments: {
@@ -165,13 +167,35 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
-      // building this model
-    interests: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Interest",
-      }
-    ]
+     
+      interests: {
+        type: [String],
+        enum: [
+          "adventure",
+          "beach",
+          "mountains",
+          "history",
+          "food",
+          "wildlife",
+          "culture",
+          "luxury",
+          "budget",
+          "road_trip",
+          "solo",
+          "group",
+          "trekking",
+          "spiritual",
+          "nature",
+          "photography",
+          "festivals",
+          "architecture",
+          "offbeat",
+          "shopping",
+        ],
+        default: [],
+       
+      },
+      
   },
 
 
