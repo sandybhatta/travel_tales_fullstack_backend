@@ -18,6 +18,12 @@ import followerOfId from "../Controllers/user.controllers/followerOfId.js"
 import followingOfUser from "../Controllers/user.controllers/followingOfUser.js"
 import mutualFollowers from "../Controllers/user.controllers/mutualFollowers.js"
 import suggestions from "../Controllers/user.controllers/suggestions.js"
+import addCloseFriend from "../Controllers/user.controllers/addCloseFriend.js"
+import removeCloseFriend from "../Controllers/user.controllers/removeCloseFriend.js"
+import getCloseFriends from "../Controllers/user.controllers/getCloseFriends.js"
+import bookmarkPost from "../Controllers/user.controllers/bookmarkPost.js"
+import getBookmarkedposts from "../Controllers/user.controllers/getBookmarkedposts.js"
+import searchMentionableUser from "../Controllers/user.controllers/searchMentionableUser.js"
 
 
 
@@ -82,6 +88,37 @@ router.get("/:id/mutual-follower",protect, mutualFollowers)
 // to suggest someone to the user
 router.get("/suggestions",protect, suggestions)
 
+
+// adding a user to my close friend list
+router.patch('/close-friends/:id',protect,addCloseFriend)
+
+
+// deleting a close Friend 
+router.delete('/close-friends/:id',protect,removeCloseFriend)
+
+
+// getting the list of the close
+
+router.get("/close-friends", protect, getCloseFriends)
+
+
+
+
+
+
+
+
+// for toggle bookmarking a post
+
+router.patch("/bookmark/:postId",protect, bookmarkPost )
+
+//for retrieving the bookmarked post
+router.get('/bookmarks',protect,getBookmarkedposts)
+
+
+// for searching user for mentions
+
+router.get('/search-mentions', protect , searchMentionableUser)
 
 
 
