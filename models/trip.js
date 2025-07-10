@@ -295,8 +295,8 @@ tripSchema.methods.isFriendInvited = function (userId) {
   };
 // is the friend accepted the trip invitation
 tripSchema.methods.isFriendAccepted = function (userId) {
-    return this.acceptedFriends.some(
-      (friendId) => friendId.toString() === userId.toString()
+    return this.acceptedFriends?.some(
+      (friend) => friend.user.toString() === userId.toString()
     );
   }; 
   
@@ -382,8 +382,9 @@ tripSchema.methods.inviteFriend = async function (userId) {
       this.invitedFriends.push(userId);
       await this.save();
     }
+    console.log("Monkey d luffy")
   
-    return this;
+  
   };
 
   // to accept a trip invitation and remove from invitedFriends
@@ -394,7 +395,7 @@ tripSchema.methods.inviteFriend = async function (userId) {
       (id) => id.toString() === userId.toString()
     );
     const alreadyAccepted = this.acceptedFriends.some(
-      (id) => id.toString() === userId.toString()
+      (id) => id.user.toString() === userId.toString()
     );
   
     if (wasInvited && !alreadyAccepted) {
@@ -404,7 +405,10 @@ tripSchema.methods.inviteFriend = async function (userId) {
       );
   
       // Add to acceptedFriends
-      this.acceptedFriends.push(userId);
+      this.acceptedFriends.push({
+        user: userId,
+        acceptedAt: new Date()
+      });
   
       await this.save();
     }

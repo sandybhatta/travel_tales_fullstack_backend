@@ -24,6 +24,8 @@ import getCloseFriends from "../Controllers/user.controllers/getCloseFriends.js"
 import bookmarkPost from "../Controllers/user.controllers/bookmarkPost.js"
 import getBookmarkedposts from "../Controllers/user.controllers/getBookmarkedposts.js"
 import searchMentionableUser from "../Controllers/user.controllers/searchMentionableUser.js"
+import getAllInvitedTrips from "../Controllers/user.controllers/getAllInvitedTrips.js"
+import getAllAcceptedTrips from "../Controllers/user.controllers/getAllAcceptedTrips.js"
 
 
 
@@ -122,7 +124,15 @@ router.get('/search-mentions', protect , searchMentionableUser)
 
 
 
+// to get the list of trips that the user has been invited
 
+router.get("/invited-trips",protect,getAllInvitedTrips)
+
+
+// api for rejecting the trips that the user was invited (not built)
+
+// to get the list of all accepted trips
+router.get("/accepted-trips", protect, getAllAcceptedTrips)
 
 
 
