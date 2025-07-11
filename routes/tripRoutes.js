@@ -14,6 +14,13 @@ import completeTrip from "../Controllers/trip.controllers/completeTrip.js";
 import inviteToTrip from "../Controllers/trip.controllers/inviteToTrip.js";
 import acceptToTrip from "../Controllers/trip.controllers/acceptToTrip.js";
 import removeCollaborator from "../Controllers/trip.controllers/removeCollaborator.js";
+import getCollaboratorsOfTrip from "../Controllers/trip.controllers/getCollaboratorsOfTrip.js";
+import getinvitedsOfTrip from "../Controllers/trip.controllers/getInvitedsOfTrip.js";
+import removeInvite from "../Controllers/trip.controllers/removeInvite.js";
+import tripsOfUser from "../Controllers/trip.controllers/tripsOfUser.js";
+import tripsCollaborated from "../Controllers/trip.controllers/tripsCollaborated.js";
+import viewableTrip from "../Controllers/trip.controllers/virewableTrip.js";
+import getPublicTrips from "../Controllers/trip.controllers/getPublicTrips.js";
 
 
 
@@ -79,22 +86,42 @@ router.post("/:tripId/invite", protect, inviteToTrip)
 router.post("/:tripId/accept", protect, acceptToTrip)
 
 
-// remove a collaborator from trip by the owner
 
+// 1.get the list of accepted friends for a trip where the user is owner
+router.get("/:tripId/collaborators",protect, getCollaboratorsOfTrip)
+
+
+// 2.remove a collaborator from trip by the owner
 router.delete("/:tripId/collaborators/:userId",protect, removeCollaborator)
 
 
+// 3. get all the invited friends of a trip by the owner
+router.get("/:tripId/invited", protect, getinvitedsOfTrip)
+
+
+
+// 4. to delete a invited Friend to a trip by the owner
+router.delete("/:tripId/invited/:userId", protect, removeInvite)
 
 
 
 
 
+// *** trip discovery and filtering
 
 
+// to see the trip list of a user where he is owner (useful for self or others)
+router.get("/:userId/own-trip", protect, tripsOfUser)
+
+// trips where user is the collaborator (useful for self or others)
+router.get("/:userId/collaborated-trip", protect, tripsCollaborated)
 
 
+//all viewable trips fo me
+router.get("/visible", protect, viewableTrip)
 
-
+// public explore feed for logged out users also
+router.get("/public", getPublicTrips)
 
 
 
