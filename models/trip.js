@@ -11,8 +11,26 @@ const tripSchema = new mongoose.Schema({
       {
         type: String,
         enum: [
-          "adventure", "beach", "mountain", "city", "honeymoon", "family",
-          "solo", "friends", "luxury", "budget", "wildlife", "roadtrip", "spiritual"
+          "adventure",
+          "beach",
+          "mountains",
+          "history",
+          "food",
+          "wildlife",
+          "culture",
+          "luxury",
+          "budget",
+          "road_trip",
+          "solo",
+          "group",
+          "trekking",
+          "spiritual",
+          "nature",
+          "photography",
+          "festivals",
+          "architecture",
+          "offbeat",
+          "shopping",
         ],
         trim: true,
         lowercase: true,
@@ -144,10 +162,7 @@ const tripSchema = new mongoose.Schema({
           type: Number, // e.g., Day 1, Day 2 of the trip
           min: 1,
         },
-        boosted: {
-          type: Boolean,
-          default: false, // can be used for trip highlights or XP bonus
-        },
+        
         isHighlighted: {
           type: Boolean,
           default: false,
@@ -352,21 +367,7 @@ tripSchema.methods.canPost = function (user) {
     );
   };
   
-// to add post safely in trip
-tripSchema.methods.addPost = async function (postId) {
-    if (!postId) throw new Error("Post ID is required");
-  
-    const exists = this.posts.some(
-      (id) => id.toString() === postId.toString()
-    );
-  
-    if (!exists) {
-      this.posts.push(postId);
-      await this.save();
-    }
-  
-    return this;
-  };
+
 // to add a friend in invited
 tripSchema.methods.inviteFriend = async function (userId) {
     if (!userId) throw new Error("User ID is required");

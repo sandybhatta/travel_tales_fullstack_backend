@@ -21,6 +21,15 @@ import tripsOfUser from "../Controllers/trip.controllers/tripsOfUser.js";
 import tripsCollaborated from "../Controllers/trip.controllers/tripsCollaborated.js";
 import viewableTrip from "../Controllers/trip.controllers/virewableTrip.js";
 import getPublicTrips from "../Controllers/trip.controllers/getPublicTrips.js";
+import getTripsByTagname from "../Controllers/trip.controllers/getTripsByTag.js";
+import discoverFeed from "../Controllers/trip.controllers/discoverFeed.js";
+import getArchivedTrips from "../Controllers/trip.controllers/getArchivedTrips.js";
+import upcomingTrips from "../Controllers/trip.controllers/upcomingTrips.js";
+import onGoingTrips from "../Controllers/trip.controllers/onGoingTrips.js";
+import pastTrips from "../Controllers/trip.controllers/pastTrips.js";
+import addPostToTrip from "../Controllers/trip.controllers/addPostToTrip.js";
+import getPostsOfTrip from "../Controllers/trip.controllers/getPostsOfTrip.js";
+import deletePostOfTrip from "../Controllers/trip.controllers/deltePostOfTrip.js";
 
 
 
@@ -55,6 +64,8 @@ router.delete("/:tripId/archive",protect,softDeleteTrip)
 // to soft delete all the trips
 router.delete("/archive-all",protect, softDeleteAll)
 
+// get all the archived trips
+router.get("/archived",protect,getArchivedTrips)
 // to restore a trip
 router.patch("/:tripId/restore",protect, restoreTrip)
 
@@ -122,6 +133,46 @@ router.get("/visible", protect, viewableTrip)
 
 // public explore feed for logged out users also
 router.get("/public", getPublicTrips)
+
+// get trips by tag
+router.get("/tag/:tagname", protect, getTripsByTagname)
+
+//feed api(not built fully + search)
+router.get("/discover/feed",protect, discoverFeed)
+
+
+
+
+
+
+//  Trip Timeline & Status
+
+// to get all the upcoming trips
+
+router.get("/status/upcoming",protect, upcomingTrips)
+
+//to get all the ongoing trips
+router.get("/status/ongoing", protect, onGoingTrips)
+
+//to get the past trips
+router.get("/status/past", protect, pastTrips)
+
+
+
+// for adding posts in a trip
+router.post("/:tripId/posts",protect, addPostToTrip)
+
+//for getting all the post and related information of a trip( as i i have done for getting info for a trip id earlier +might build it later)
+
+//🕒 router.get("/:tripId/posts",protect, getPostsOfTrip)
+
+
+
+
+// for deleting a post from a trip
+
+router.delete("/:tripId/posts/:postId", protect, deletePostOfTrip)
+
 
 
 
