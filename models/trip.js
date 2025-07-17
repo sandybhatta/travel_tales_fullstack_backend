@@ -90,7 +90,10 @@ const tripSchema = new mongoose.Schema({
           type:Number,
           required:true
         },
-        spentBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        spentBy: { 
+          type: mongoose.Schema.Types.ObjectId, 
+          ref: "User" 
+        },
         createdAt: { type: Date, default: Date.now }
       }
     ],
@@ -262,20 +265,10 @@ tripSchema.virtual("isCollaborative").get(function () {
 //    now instance methods
 
 
-// for adding note
-tripSchema.methods.addNote = function (userId, body) {
-  this.notes.push({ body, createdBy: userId });
-  return this.save();
-};
 
 
-// to pinnig a note
 
-tripSchema.methods.pinNote = function (noteId) {
-  const note = this.notes.id(noteId);
-  if (note) note.isPinned = !note.isPinned;
-  return this.save();
-};
+
 
 // for adding in todo list
 tripSchema.methods.addTodo = function (userId, task, assignedTo, dueDate) {
