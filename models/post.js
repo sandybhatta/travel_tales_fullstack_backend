@@ -37,9 +37,9 @@ const postSchema = new mongoose.Schema(
     // 🖼️ Media (Images / Videos via Cloudinary)
     media: [
       {
-        public_id: String, // for Cloudinary deletion
+        public_id: String, 
         url: String,
-        type: {
+        resource_type: {
           type: String,
           enum: ["image", "video"],
           default: "image",
@@ -96,6 +96,14 @@ const postSchema = new mongoose.Schema(
       type: Date,
     },
 
+    mentions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    
+    
     // 🏅 XP Boost or Featured tag
     isFeatured: {
       type: Boolean,
