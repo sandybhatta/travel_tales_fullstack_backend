@@ -39,6 +39,11 @@ import deleteExpense from "../Controllers/trip.controllers/deleteExpense.js";
 import addNote from "../Controllers/trip.controllers/addNote.js";
 import getNotes from "../Controllers/trip.controllers/getNotes.js";
 import deleteNote from "../Controllers/trip.controllers/deleteNote.js";
+import pinUnpinNote from "../Controllers/trip.controllers/pinUnpinNote.js";
+import addTodo from "../Controllers/trip.controllers/addTodo.js";
+import getTodo from "../Controllers/trip.controllers/getTodo.js";
+import toggleTodo from "../Controllers/trip.controllers/toggleTodo.js";
+import deleteTodo from "../Controllers/trip.controllers/deleteTodo.js";
 
 
 
@@ -227,6 +232,36 @@ router.get("/:tripId/notes", protect, getNotes)
 router.delete("/:tripId/notes/:noteId/pin" , protect , deleteNote)
 
 
+
+
+// pin unpin a note
+router.patch("/:tripId/notes/:noteId/pin" , protect ,pinUnpinNote)
+
+
+
+
+
+
+
+
+
+
+
+// 9. Todo List / Planning
+
+// adding todo in a trip
+router.post("/:tripId/todos" ,  protect, addTodo)
+
+// list todo of trip
+router.get("/:tripId/todos" , protect , getTodo)
+
+
+// toggle task done
+router.patch("/:tripId/todos/:todoId/toggle", protect , toggleTodo)
+
+
+// deleting a todo from a trip
+router.delete("/:tripId/todos/:todoId", protect , deleteTodo)
 
 
 
