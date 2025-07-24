@@ -6,19 +6,19 @@ const bookmarkPost = async (req, res) => {
   const userId = req.user._id;
 
   try {
-    // ✅ Check if post exists
+    //  Check if post exists
     const post = await Post.findById(postId);
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    // ✅ Check if already bookmarked
+    //  Check if already bookmarked
     const isBookmarked = req.user.bookmarks?.some(
       (id) => id.toString() === postId.toString()
     );
 
     if (isBookmarked) {
-      // 🔄 Unbookmark
+      //  Unbookmark
       await Promise.all([
         User.findByIdAndUpdate(userId, { $pull: { bookmarks: postId } }),
         Post.findByIdAndUpdate(postId, { $pull: { bookmarkedBy: userId } }),
@@ -28,7 +28,7 @@ const bookmarkPost = async (req, res) => {
         .status(200)
         .json({ message: "Post removed from your bookmarks", bookmarked: false });
     } else {
-      // ✅ Bookmark
+      //  Bookmark
       await Promise.all([
         User.findByIdAndUpdate(userId, { $addToSet: { bookmarks: postId } }),
         

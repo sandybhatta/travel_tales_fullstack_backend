@@ -7,6 +7,12 @@ import editPost from "../Controllers/post.controllers/editPost";
 import sharePost from "../Controllers/post.controllers/sharepost";
 import toggleLikePost from "../Controllers/post.controllers/togglelikePost";
 import getLikesOfPost from "../Controllers/post.controllers/getLikesOfPost";
+import postsLikedByUser from "../Controllers/post.controllers/postsLikedByUser";
+import mentionedPost from "../Controllers/post.controllers/mentionedPost";
+import myPost from "../Controllers/post.controllers/myPost";
+import postOfOthers from "../Controllers/post.controllers/postOfOthers";
+import feedOfFollowing from "../Controllers/post.controllers/feedOfFollowing";
+import exploreFeed from "../Controllers/post.controllers/exploreFeed";
 const router = express.Router();
 
 
@@ -20,6 +26,7 @@ router.post("/",upload.array("post",20), protect, createPost)
 // get post details
 router.get("/:postId",protect, getPostDetails)
 
+//share a post
 router.post("/:postId/share", protect , sharePost)
 
 // to edit a post
@@ -35,8 +42,30 @@ router.patch("/:postId/like", protect , toggleLikePost)
 router.get("/:postId/likes", protect, getLikesOfPost)
 
 
+// get all post liked by the current user
+router.get("/liked-posts" , protect , postsLikedByUser)
+
+
+// posts that the user has been mentioned
+router.get("/mentioned-posts", protect , mentionedPost)
+
+// posts that current user have made
+router.get("/me", protect , myPost)
+
+
+//all posts of a specific user
+router.get("/user/:userId" , protect , postOfOthers)
 
 
 
+
+// feed of posts of following
+router.get("/feed/following", protect , feedOfFollowing)
+
+
+
+
+// feed for exploring
+router.get("/feed/explore" , protect , exploreFeed)
 
 export default router;
