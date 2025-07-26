@@ -4,7 +4,7 @@ import { sendWelcomeEmail } from "../../utils/sendWelcomeEmail.js";
 
 export const verifyEmail = async (req, res) => {
   try {
-    const token = req.query.token;
+    const {token} = req.query;
     if (!token) {
       return res.status(400).json({ message: "No token provided" });
     }

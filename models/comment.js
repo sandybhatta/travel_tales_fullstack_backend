@@ -52,12 +52,7 @@ const commentSchema = new mongoose.Schema(
   }
 );
 
-// Virtual for nested replies
-commentSchema.virtual("replies", {
-  ref: "Comment",
-  localField: "_id",
-  foreignField: "parentComment",
-});
+
 
 
 // is the comment liked by the user
@@ -68,25 +63,7 @@ commentSchema.methods.isLikedBy = function (userId) {
     );
   };
 
-//for toggling comment likes
-commentSchema.methods.toggleLike = async function (userId) {
-    if (!userId) throw new Error("User ID is required");
-  
-    const hasLiked = this.isLikedBy(userId); // 👈 using helper
-  
-    if (hasLiked) {
-      this.likes.pull(userId); // Unlike
-    } else {
-      this.likes.push(userId); // Like
-    }
-  
-    await this.save();
-  
-    return {
-      updatedComment: this,
-      liked: !hasLiked
-    };
-  };
+
   
   //is reply virtual method to send in response
 
@@ -112,40 +89,7 @@ commentSchema.methods.softDelete = async function () {
     return this; // return the updated comment if needed
   };
 
-  // to get the mentioned users from the content
-  commentSchema.methods.getMentionedUsers = async function (returnFullDocs = false) {
-    if (!this.content) return [];
-  
-    const words = this.content.split(" ");
-    const usernames = [];
-    const trailingChars = [",", ".", "!", "?", ";", ":"];
-  
-    for (let word of words) {
-      if (word.startsWith("@")) {
-        let username = word.slice(1).toLowerCase(); // remove '@'
-  
-        // Remove trailing punctuation without regex
-        while (
-          username.length &&
-          trailingChars.includes(username[username.length - 1])
-        ) {
-          username = username.slice(0, -1); // remove last character
-        }
-  
-        if (username && !usernames.includes(username)) {
-          usernames.push(username);
-        }
-      }
-    }
-  
-    if (!returnFullDocs) {
-      return usernames; // ['john', 'sandi']
-    }
-  
-    const User = mongoose.model("User");
-    const users = await User.find({ username: { $in: usernames } });
-    return users;
-  };
+ 
  
   
   commentSchema.statics.getThread = async function (postId) {

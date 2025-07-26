@@ -25,7 +25,7 @@ if(!email){
 
     //if user is found but not verified then resend the verification email
     if(existingUser.isVerified){
-        return res.status(200).send({message:"Email is already verified"})
+        return res.status(200).send({message:"Email is already verified . please Login"})
     }
 
     if(existingUser.isDeactivated){

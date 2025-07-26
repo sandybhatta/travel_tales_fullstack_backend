@@ -1,4 +1,4 @@
-import { uploadToCloudinary } from "../../utils/cloudinary";
+import { uploadToCloudinary } from "../../utils/cloudinary.js";
 
 
 

@@ -27,17 +27,17 @@ export const resendOtp = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found." });
-    if(user.isDeactivate){
+    if(user.isDeactivated){
       return res.status(403).json({ message: "Account is deactivated " });
     }
 
-    // 🧼 Delete old OTPs of same type
+    //  Delete old OTPs of same type
     await OTP.deleteMany({ user: user._id, type });
 
-    // 🔄 Generate new OTP
+    //  Generate new OTP
     const newOtp = await OTP.generateOtpForUser(user._id, type);
 
-    // ✉️ Resend email
+    //  Resend email
     await sendOTPEmail(user.email, user.username, newOtp);
 
     res.status(200).json({ message: "A new OTP has been sent to your email." });

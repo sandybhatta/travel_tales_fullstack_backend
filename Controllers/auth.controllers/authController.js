@@ -37,7 +37,7 @@ export const registeruser = async (req, res) => {
     const existingUsername = await User.findOne({ username });
 
     if (existingEmail?.isVerified) {
-      return res.status(400).json({ message: "Email is already in use." });
+      return res.status(400).json({ message: "Email is already in use. " });
     }
 
     if (existingEmail?.isDeactivated) {
@@ -156,7 +156,7 @@ if(otpOfUser && otpOfUser.expiresAt > Date.now() ){
     await sendOTPEmail(user.email, user.username,otp);
     res.status(200).json({
       message: "verify the otp sent to your email",
-      user: user._id
+      userId: user._id
     })
 
 }catch(error){
@@ -475,7 +475,8 @@ export const reactivateUser =  async(req,res)=>{
 
       return res.status(200).send({ message: "Account reactivated. You can now log in." });
     }catch(err){
-
+      console.error("Reactivation Error:", err);
+      res.status(500).send({ message: "Server error", error: err.message });
     }
 
 }
