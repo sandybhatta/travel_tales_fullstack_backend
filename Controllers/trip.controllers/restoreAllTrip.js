@@ -1,8 +1,8 @@
 
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 
 const restoreAllTrip = async (req,res)=>{
-const {user}=req;
+const user=req.user;
 
 try {
 

@@ -1,8 +1,8 @@
-import Post from "../../models/post.js";
+import Post from "../../models/Post.js";
 
 const postsLikedByUser = async (req, res) => {
   try {
-    const { user } = req;
+    const user = req.user;
     const page = parseInt(req.query.page);
     const limit = 20;
     const skip = (page-1)*limit

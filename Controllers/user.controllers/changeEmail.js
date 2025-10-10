@@ -3,7 +3,7 @@ import { sendEmail } from "../../utils/transportEmail.js";
 
 const changeEmail = async (req, res) => {
   const { email } = req.body;
-  const { user } = req;
+  const user = req.user;
 
   try {
     if (!email) {

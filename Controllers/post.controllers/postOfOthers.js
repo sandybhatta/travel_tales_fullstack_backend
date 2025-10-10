@@ -1,9 +1,9 @@
-import Post from "../../models/post.js";
+import Post from "../../models/Post.js";
 import User from "../../models/User.js";
 
 const postOfOthers = async (req, res) => {
   try {
-    const { user } = req;
+    const user = req.user;
     const { userId } = req.params;
 
     const anotherUser = await User.findById(userId);

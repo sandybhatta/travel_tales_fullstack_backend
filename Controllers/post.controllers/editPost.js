@@ -1,12 +1,12 @@
 
-import Post from "../../models/post.js";
-import Trip from "../../models/trip.js";
+import Post from "../../models/Post.js";
+import Trip from "../../models/Trip.js";
 import User from "../../models/User.js";
 
 const editPost = async (req, res) => {
   try {
     const { caption, location, visibility, tripId } = req.body;
-    const { user } = req;
+    const user = req.user;
     const { postId } = req.params;
 
     const post = await Post.findById(postId);

@@ -1,8 +1,8 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 
 const onGoingTrips = async (req, res) => {
   try {
-    const { user } = req;
+    const user = req.user;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0); 

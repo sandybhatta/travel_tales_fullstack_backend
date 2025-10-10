@@ -1,7 +1,7 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 
 const softDeleteAll = async (req, res) => {
-  const { user } = req;
+  const user = req.user;
 
   try {
     const activeTrips = await Trip.find({

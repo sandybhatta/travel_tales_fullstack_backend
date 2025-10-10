@@ -1,11 +1,11 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 import User from "../../models/User.js";
 
 const addTodo = async (req, res) => {
   try {
     const { task, dueDate, assignedTo } = req.body;
     const { tripId } = req.params;
-    const { user } = req;
+    const user = req.user;
 
     if (!task || !task.trim()) {
       return res.status(400).json({ message: "Task is required and cannot be empty." });

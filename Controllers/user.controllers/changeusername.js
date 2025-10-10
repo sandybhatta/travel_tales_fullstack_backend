@@ -1,7 +1,7 @@
 import User from "../../models/User.js";
 
 const changeUsername = async (req, res) => {
-  const { user } = req;
+  const user = req.user;
   let { username } = req.body;
 
   try {

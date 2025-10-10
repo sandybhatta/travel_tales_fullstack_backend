@@ -1,9 +1,9 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 
 
 const removeInvite = async (req, res) => {
   const { tripId, userId } = req.params;
-  const { user } = req;
+  const user = req.user;
 
   if (!tripId || !userId) {
     return res.status(400).json({ message: "Trip ID and User ID are both required." });

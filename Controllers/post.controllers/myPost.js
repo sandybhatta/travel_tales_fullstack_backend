@@ -1,9 +1,9 @@
-import Post from "../../models/post.js";
+import Post from "../../models/Post.js";
 
 const myPost = async (req,res)=>{
 
     try {
-        const { user } = req;
+        const user = req.user;
         const post = await Post.find({
             author:user._id
         }).populate([

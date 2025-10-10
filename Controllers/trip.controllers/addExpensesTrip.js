@@ -1,10 +1,10 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 
 const addExpensesTrip = async (req, res) => {
   try {
     const { title, amount, spentBy } = req.body;
     const { tripId } = req.params;
-    const { user } = req;
+    const user = req.user;
 
     // 1. Validation
     if (!title || !amount) {

@@ -1,8 +1,8 @@
-import Post from "../../models/post.js";
+import Post from "../../models/Post.js";
 
 const feedOfFollowing = async (req, res) => {
   try {
-    const { user } = req;
+    const user = req.user;
     const followingIds = user.following.map((userId) => userId.toString());
 
     const posts = await Post.find({

@@ -1,8 +1,8 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 
 const visibilityChange = async (req, res) => {
   const { tripId } = req.params;
-  const { user } = req;
+  const user = req.user;
   const { visibility } = req.body;
 
   try {

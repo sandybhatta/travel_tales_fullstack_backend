@@ -1,8 +1,8 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 
 const completeTrip =async(req,res)=>{
     const {tripId} =req.params;
-    const {user} = req;
+    const user = req.user;
 try {
     if(!tripId){
         return res.status(400).json({message:"trip id was not given"})

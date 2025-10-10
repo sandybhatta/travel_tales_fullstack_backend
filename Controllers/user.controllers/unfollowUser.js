@@ -4,7 +4,7 @@ import User from "../../models/User.js"
 const unfollowUser =async (req,res)=>{
     const {id}=req.params
 
-    const {user} = req
+    const user = req.user
 
     try {
         if(user._id.toString()===id.toString()){

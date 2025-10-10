@@ -2,7 +2,7 @@ import Comment from "../../models/comment.js";
 
 const likeUnlikeComment = async (req, res) => {
   try {
-    const { user } = req;
+    const user = req.user;
     const { commentId } = req.params;
 
     const comment = await Comment.findById(commentId).select("likes");

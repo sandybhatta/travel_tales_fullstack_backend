@@ -1,9 +1,9 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 
 const toggleTodo = async (req, res) => {
   try {
     const { tripId, todoId } = req.params;
-    const { user } = req;
+    const user = req.user;
 
     const trip = await Trip.findById(tripId);
     if (!trip) {

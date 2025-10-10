@@ -1,11 +1,11 @@
-import Post from "../../models/post.js";
+import Post from "../../models/Post.js";
 import Comment from "../../models/comment.js";
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 
 const getPostDetails = async (req, res) => {
   try {
     const { postId } = req.params;
-    const { user } = req;
+    const user = req.user;
 
     const post = await Post.findById(postId)
       .populate([

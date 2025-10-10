@@ -4,7 +4,7 @@ import User from "../../models/User.js";
 const editComment = async (req, res) => {
   try {
     const { commentId } = req.params;
-    const { user } = req;
+    const  user  = req.user;
     const { content } = req.body;
 
     const trimmedContent = content?.trim();

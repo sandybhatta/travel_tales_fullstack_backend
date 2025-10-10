@@ -1,10 +1,10 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 import User from "../../models/User.js";
 
 const getLikesOfTrip = async (req, res) => {
   try {
     const { tripId } = req.params;
-    const { user } = req;
+    const user = req.user;
 
     const trip = await Trip.findById(tripId)
       .select("likes")

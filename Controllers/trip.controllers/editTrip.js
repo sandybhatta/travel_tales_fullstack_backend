@@ -1,10 +1,10 @@
-import Trip from "../../models/trip.js"
+import Trip from "../../models/Trip.js"
 
 import cloudinary, { uploadToCloudinary } from "../../utils/cloudinary.js";
 const editTrip = async(req,res)=>{
 
     const {tripId}=req.params;
-    const {user}=req
+    const user=req.user
 
     const {title, description ,tags ,startDate ,endDate ,destinations ,visibility ,travelBudget ,isArchived ,isCompleted ,coverPhoto , ...others  } = req.body
     if (!tripId) {

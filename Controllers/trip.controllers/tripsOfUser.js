@@ -1,9 +1,9 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 import User from "../../models/User.js";
 
 const tripsOfUser = async (req, res) => {
   const { userId } = req.params;
-  const { user } = req;
+  const user = req.user;
 
   if (!userId) {
     return res.status(400).json({ message: "User ID was not provided." });

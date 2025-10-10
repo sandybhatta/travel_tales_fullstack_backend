@@ -1,4 +1,4 @@
-import Post from "../../models/post.js";
+import Post from "../../models/Post.js";
 import User from "../../models/User.js";
 
 // 🔁 Recursive function to trace the original post
@@ -12,7 +12,7 @@ const sharePost = async (req, res) => {
   try {
     const { postId } = req.params;
     const { caption, taggedUsers = [], location, visibility } = req.body;
-    const { user } = req;
+    const user = req.user;
 
     //  Get the very original post (not just the shared one)
     const originalPost = await findOriginalPost(postId);

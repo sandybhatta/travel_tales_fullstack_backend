@@ -1,8 +1,8 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 
 const getArchivedTrips = async (req, res) => {
   try {
-    const { user } = req;
+    const user = req.user;
 
     const archivedTrips = await Trip.find({
       user: user._id,

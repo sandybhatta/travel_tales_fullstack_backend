@@ -11,6 +11,7 @@ import userRoutes from "./routes/userRoutes.js"
 import tripRoutes from "./routes/tripRoutes.js"
 import postRoutes from "./routes/postRoutes.js"
 import commentRoutes  from "./routes/commentRoutes.js"
+import searchRoutes from "./routes/searchRoutes.js"
 import { scheduleTripCompletion } from "./cronJob/scheduleTripCompletion.js";
 
 
@@ -37,7 +38,7 @@ app.use(cors({
 
 
 app.get("/", (req, res) => {
-  res.send("🌍 API is running...");
+  res.send(" API is running...");
 });
 
 
@@ -54,6 +55,7 @@ app.use("/api/posts", postRoutes )
 
 app.use("/api/comment",commentRoutes)
 
+app.use('/api/search',searchRoutes)
 
 
 

@@ -1,10 +1,10 @@
-import Post from "../../models/post.js";
+import Post from "../../models/Post.js";
 import Comment from "../../models/comment.js";
 import User from "../../models/User.js";
 
 const createRootComment = async (req, res) => {
   try {
-    const { user } = req;
+    const  user  = req.user;
     const { postId } = req.params;
     const { content } = req.body;
 

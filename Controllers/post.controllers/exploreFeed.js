@@ -1,10 +1,10 @@
-import Post from "../../models/post.js";
-import Trip from "../../models/trip.js";
+import Post from "../../models/Post.js";
+import Trip from "../../models/Trip.js";
 import User from "../../models/User.js";
 
 const exploreFeed = async (req, res) => {
   try {
-    const { user } = req;
+    const user = req.user;
     const page = parseInt(req.query.page) || 0;
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page-1)*limit;

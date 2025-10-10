@@ -1,10 +1,10 @@
-import Trip from "../../models/trip.js";
-import Post from "../../models/post.js";
+import Trip from "../../models/Trip.js";
+import Post from "../../models/Post.js";
 
 const highlightPost = async (req, res) => {
   try {
     const { tripId, postId } = req.params;
-    const { user } = req;
+    const user = req.user;
 
     const post = await Post.findById(postId);
     const trip = await Trip.findById(tripId);

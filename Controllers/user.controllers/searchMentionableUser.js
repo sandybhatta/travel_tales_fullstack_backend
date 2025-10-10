@@ -2,7 +2,7 @@ import User from "../../models/User.js";
 
 const searchMentionableUser = async (req, res) => {
   try {
-    const { user } = req; // from protect middleware
+    const user = req.user; // from protect middleware
     const { q } = req.query;
 
     if (!q || q.trim().length < 1) {
