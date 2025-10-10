@@ -40,7 +40,7 @@ otpTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 
 
-// 🔐 Instance method to validate OTP
+//  Instance method to validate OTP
 otpTokenSchema.methods.isValidOtp = function (enteredOtp) {
   const enteredHash = crypto
     .createHash("sha256")
@@ -50,7 +50,7 @@ otpTokenSchema.methods.isValidOtp = function (enteredOtp) {
   return this.otp === enteredHash && this.expiresAt > new Date();
 };
 
-// 🛠 Static to generate OTP
+//  Static to generate OTP
 otpTokenSchema.statics.generateOtpForUser = async function (userId, type) {
   const rawOtp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
 

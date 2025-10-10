@@ -1,18 +1,18 @@
 import express from "express"
-import { protect } from "../middlewares/authMiddleware";
-import { upload } from "../middlewares/multer";
-import createPost from "../Controllers/post.controllers/createPost";
-import getPostDetails from "../Controllers/post.controllers/getPostDetails";
-import editPost from "../Controllers/post.controllers/editPost";
-import sharePost from "../Controllers/post.controllers/sharepost";
-import toggleLikePost from "../Controllers/post.controllers/togglelikePost";
-import getLikesOfPost from "../Controllers/post.controllers/getLikesOfPost";
-import postsLikedByUser from "../Controllers/post.controllers/postsLikedByUser";
-import mentionedPost from "../Controllers/post.controllers/mentionedPost";
-import myPost from "../Controllers/post.controllers/myPost";
-import postOfOthers from "../Controllers/post.controllers/postOfOthers";
-import feedOfFollowing from "../Controllers/post.controllers/feedOfFollowing";
-import exploreFeed from "../Controllers/post.controllers/exploreFeed";
+import { protect } from "../middlewares/authMiddleware.js";
+import { upload } from "../middlewares/multer.js";
+import createPost from "../Controllers/post.controllers/createPost.js";
+import getPostDetails from "../Controllers/post.controllers/getPostDetails.js";
+import editPost from "../Controllers/post.controllers/editPost.js";
+import sharePost from "../Controllers/post.controllers/sharepost.js";
+import toggleLikePost from "../Controllers/post.controllers/togglelikePost.js";
+import getLikesOfPost from "../Controllers/post.controllers/getLikesOfPost.js";
+import postsLikedByUser from "../Controllers/post.controllers/postsLikedByUser.js";
+import mentionedPost from "../Controllers/post.controllers/mentionedPost.js";
+import myPost from "../Controllers/post.controllers/myPost.js";
+import postOfOthers from "../Controllers/post.controllers/postOfOthers.js";
+import feedOfFollowing from "../Controllers/post.controllers/feedOfFollowing.js";
+import exploreFeed from "../Controllers/post.controllers/exploreFeed.js";
 const router = express.Router();
 
 

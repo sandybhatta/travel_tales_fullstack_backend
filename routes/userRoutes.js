@@ -1,7 +1,7 @@
 import express from "express"
 
 import { protect } from "../middlewares/authMiddleware.js"
-
+import {upload} from "../middlewares/multer.js"
 
 
 import deleteUser from "../Controllers/user.controllers/deleteUser.js"

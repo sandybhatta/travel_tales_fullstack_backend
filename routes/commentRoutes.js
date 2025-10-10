@@ -1,12 +1,12 @@
 import express from "express"
-import { protect } from "../middlewares/authMiddleware";
-import createRootComment from "../Controllers/comment.controllers/createRootComment";
-import getRootComment from "../Controllers/comment.controllers/getRootComment";
-import replyOfComment from "../Controllers/comment.controllers/replyOfComment";
-import getReply from "../Controllers/comment.controllers/getReply";
-import editComment from "../Controllers/comment.controllers/editComment";
-import likeUnlikeComment from "../Controllers/comment.controllers/likeunlikecomment";
-import getListOfLikeOfComment from "../Controllers/comment.controllers/getListOfLikeOfComment";
+import { protect } from "../middlewares/authMiddleware.js";
+import createRootComment from "../Controllers/comment.controllers/createRootComment.js";
+import getRootComment from "../Controllers/comment.controllers/getRootComment.js";
+import replyOfComment from "../Controllers/comment.controllers/replyOfComment.js";
+import getReply from "../Controllers/comment.controllers/getReply.js";
+import editComment from "../Controllers/comment.controllers/editComment.js";
+import likeUnlikeComment from "../Controllers/comment.controllers/likeunlikecomment.js";
+import getListOfLikeOfComment from "../Controllers/comment.controllers/getListOfLikeOfComment.js";
 
 const router = express.Router();
 
