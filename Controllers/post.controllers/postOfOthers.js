@@ -3,7 +3,7 @@ import User from "../../models/User.js";
 
 const postOfOthers = async (req, res) => {
   try {
-    const { user } = req;
+    const user = req.user;
     const { userId } = req.params;
 
     const anotherUser = await User.findById(userId);

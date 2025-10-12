@@ -4,7 +4,7 @@ import User from "../../models/User.js"
 const getCloseFriends = async (req, res)=>{
 
     try {
-        const {user}=req
+        const user=req.user
     
     if(!user.closeFriends || user.closeFriends.length === 0){
         return res.status(200).json({message:" you have no close friends"})

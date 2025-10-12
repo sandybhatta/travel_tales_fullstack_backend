@@ -4,7 +4,7 @@ import Post from "../../models/post.js";
 const deletePostOfTrip = async (req, res) => {
   try {
     const { tripId, postId } = req.params;
-    const { user } = req;
+    const user = req.user;
 
     const trip = await Trip.findById(tripId);
     if (!trip) {

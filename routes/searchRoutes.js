@@ -6,7 +6,10 @@ import searchUsers from "../Controllers/search.controllers/Searchusers.js";
 const router = express.Router()
 
 router.get("/", protect, globalSearch)
+
 router.get("/users" , protect , searchUsers)
+
+router.get("/posts" , protect , searchUsers)
 
 
 export default router;

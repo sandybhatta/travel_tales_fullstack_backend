@@ -3,7 +3,7 @@ import Trip from "../../models/trip.js";
 const toggleTodo = async (req, res) => {
   try {
     const { tripId, todoId } = req.params;
-    const { user } = req;
+    const user = req.user;
 
     const trip = await Trip.findById(tripId);
     if (!trip) {

@@ -1,7 +1,7 @@
 import Post from "../../models/post.js";
 
 const getBookmarkedPosts = async (req, res) => {
-  const { user } = req;
+  const user = req.user;
 
   try {
     const bookmarkedPosts = await Post.find({ _id: { $in: user.bookmarks } })

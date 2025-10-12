@@ -3,7 +3,7 @@ import Comment from "../../models/comment.js";
 const getListOfLikeOfComment = async (req, res) => {
   try {
     const { commentId } = req.params;
-    const { user } = req;
+    const user = req.user;
 
     const comment = await Comment.findById(commentId)
       .select("likes")

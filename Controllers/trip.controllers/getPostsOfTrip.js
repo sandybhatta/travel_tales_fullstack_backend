@@ -3,7 +3,7 @@ import Trip from "../../models/trip.js";
 const getPostsOfTrip = async ()=>{
 
     try {
-        const {user} = req;
+        const user = req.user;
         const{tripId} = req.params;
         
         const trip = await Trip.findById(tripId);

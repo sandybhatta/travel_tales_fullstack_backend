@@ -4,7 +4,7 @@ import Post from "../../models/post.js";
 const highlightPost = async (req, res) => {
   try {
     const { tripId, postId } = req.params;
-    const { user } = req;
+    const user = req.user;
 
     const post = await Post.findById(postId);
     const trip = await Trip.findById(tripId);

@@ -2,7 +2,7 @@ import Comment from "../../models/comment.js";
 
 const getReply = async (req, res) => {
   try {
-    const { user } = req;
+    const user = req.user;
     const { parentCommentId } = req.params;
 
     const parentComment = await Comment.findById(parentCommentId);

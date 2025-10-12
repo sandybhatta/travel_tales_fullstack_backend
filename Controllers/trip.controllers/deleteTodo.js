@@ -3,7 +3,7 @@ import Trip from "../../models/trip.js";
 const deleteTodo = async(req,res)=>{
     try {
         const { tripId , todoId } = req.params;
-        const { user } = req;
+        const user = req.user;
         const trip = await Trip.findById(tripId);
         if(!trip){
             return res.status(404).json({message:"No trip found"})

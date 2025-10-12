@@ -5,7 +5,7 @@ import Trip from "../../models/trip.js";
 const getPostDetails = async (req, res) => {
   try {
     const { postId } = req.params;
-    const { user } = req;
+    const user = req.user;
 
     const post = await Post.findById(postId)
       .populate([

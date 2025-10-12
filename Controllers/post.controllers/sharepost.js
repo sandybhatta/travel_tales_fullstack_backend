@@ -12,7 +12,7 @@ const sharePost = async (req, res) => {
   try {
     const { postId } = req.params;
     const { caption, taggedUsers = [], location, visibility } = req.body;
-    const { user } = req;
+    const user = req.user;
 
     //  Get the very original post (not just the shared one)
     const originalPost = await findOriginalPost(postId);

@@ -2,7 +2,7 @@
 import Trip from "../../models/trip.js";
 
 const restoreAllTrip = async (req,res)=>{
-const {user}=req;
+const user=req.user;
 
 try {
 

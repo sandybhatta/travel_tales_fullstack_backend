@@ -2,7 +2,7 @@ import Trip from "../../models/trip.js";
 
 const getNotes = async(req,res)=>{
 try {
-    const { user } = req
+    const user = req.user
     const { tripId } = req.params;
     const trip = await Trip.findById(tripId).select("notes").populate("notes.createdBy" , "name username avatar")
     if (!trip) {

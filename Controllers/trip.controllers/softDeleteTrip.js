@@ -2,7 +2,7 @@ import Trip from "../../models/trip.js"
 
 const softDeleteTrip = async (req,res)=>{
 const {tripId} = req.params;
-const {user} = req;
+const user = req.user;
 
     if(!tripId){
         return res.status(400).send({message:"trip id was not provided"})

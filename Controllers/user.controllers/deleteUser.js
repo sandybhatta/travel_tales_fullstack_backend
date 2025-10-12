@@ -8,7 +8,7 @@ import Token from "../../models/token.js";
 import { deleteCommentThread } from "../../utils/deleteCommentThread.js";
 
 const  deleteUser = async (req, res) => {
-  const { user } = req;
+  const user = req.user;
   const { password } = req.body;
 
   try {

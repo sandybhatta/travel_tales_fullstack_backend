@@ -2,7 +2,7 @@ import Trip from "../../models/trip.js";
 
 const getExpensesTrip = async (req, res) => {
   try {
-    const { user } = req;
+    const user = req.user;
     const { tripId } = req.params;
 
     const trip = await Trip.findById(tripId)

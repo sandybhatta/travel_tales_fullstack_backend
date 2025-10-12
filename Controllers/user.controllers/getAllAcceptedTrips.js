@@ -3,7 +3,7 @@ import Trip from "../../models/trip.js";
 
 
 const getAllAcceptedTrips =async(req,res)=>{
-const {user} = req;
+const user = req.user;
 
 try {
     const allAcceptedTrips = await Trip.find({acceptedFriends:user._id}).populate("user", "name username avatar").sort({startDate:-1})

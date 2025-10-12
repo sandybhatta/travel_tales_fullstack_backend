@@ -2,7 +2,7 @@ import User from "../../models/User.js"
 
 const addCloseFriend = async (req,res)=>{
 const {id}=req.params
-const {user}=req
+const user=req.user
 
 try {
         

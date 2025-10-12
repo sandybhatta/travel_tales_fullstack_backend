@@ -3,7 +3,7 @@ import Post from "../../models/post.js";
 
 const getRootComment = async (req, res) => {
   try {
-    const{user} = req;
+    const user = req.user ;
     const { postId } = req.params;
 
     const post = await Post.findById(postId).select("_id");

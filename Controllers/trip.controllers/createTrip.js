@@ -3,7 +3,7 @@ import User from "../../models/User.js";
 import { uploadToCloudinary } from "../../utils/cloudinary.js";
 
 const createTrip = async (req, res) => {
-  const { user } = req;
+  const user = req.user;
 
   // 1. Check for banned or deactivated users
   if (user.isBanned) {

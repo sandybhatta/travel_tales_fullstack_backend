@@ -4,7 +4,7 @@ import User from "../../models/User.js";
 
 const replyOfComment = async (req, res) => {
   try {
-    const { user } = req;
+    const user  = req.user;
     const { content } = req.body;
     const { postId, rootCommentId, parentCommentId } = req.params;
 

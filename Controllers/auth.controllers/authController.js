@@ -400,7 +400,7 @@ export const changePassword = async(req,res)=>{
 
 export const deactivateUser =async(req,res)=>{
  
-  const {user} = req
+  const user = req.user
   const {deactivationReason}=req.body
 
   try{

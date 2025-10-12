@@ -4,7 +4,7 @@ import User from "../../models/User.js";
 
 const createRootComment = async (req, res) => {
   try {
-    const { user } = req;
+    const  user  = req.user;
     const { postId } = req.params;
     const { content } = req.body;
 

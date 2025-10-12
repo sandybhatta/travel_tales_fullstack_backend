@@ -1,7 +1,7 @@
 import Trip from "../../models/trip.js";
 
 const getAllInvitedTrips = async (req, res) => {
-  const { user } = req;
+  const user = req.user;
 
   try {
     const invitedTrips = await Trip.find({

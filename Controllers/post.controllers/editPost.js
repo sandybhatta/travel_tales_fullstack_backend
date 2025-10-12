@@ -6,7 +6,7 @@ import User from "../../models/User.js";
 const editPost = async (req, res) => {
   try {
     const { caption, location, visibility, tripId } = req.body;
-    const { user } = req;
+    const user = req.user;
     const { postId } = req.params;
 
     const post = await Post.findById(postId);

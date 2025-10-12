@@ -2,7 +2,7 @@ import Trip from "../../models/trip.js";
 
 const getCollaboratorsOfTrip = async (req, res) => {
   const { tripId } = req.params;
-  const { user } = req;
+  const user = req.user;
 
   try {
     if (!tripId) {

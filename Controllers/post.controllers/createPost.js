@@ -5,7 +5,7 @@ import User from "../../models/User.js"
 
 const createPost = async (req, res) => {
   try {
-    const { user } = req;
+    const user = req.user;
     const { caption, taggedUsers = [], tripId, location ,visibility} = req.body;
 
     if (!caption && (!req.files || req.files.length === 0)) {

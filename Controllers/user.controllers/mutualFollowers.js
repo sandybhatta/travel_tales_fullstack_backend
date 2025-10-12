@@ -2,7 +2,7 @@ import User from "../../models/User.js";
 
 const mutualFollowers = async (req, res) => {
   const { id } = req.params;
-  const { user } = req;
+  const user = req.user;
 
   const skip = parseInt(req.query.skip) || 0;
   const limit = parseInt(req.query.limit) || 10;

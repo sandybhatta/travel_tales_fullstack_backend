@@ -3,7 +3,7 @@ import User from "../../models/User.js";
 const removeCloseFriend = async (req, res) => {
   try {
     const { id } = req.params;
-    const { user } = req;
+    const user = req.user;
 
     // Check if the ID is in the closeFriends list
     const isACloseFriend = user.closeFriends?.some(

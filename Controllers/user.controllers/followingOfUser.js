@@ -2,7 +2,7 @@ import User from "../../models/User.js";
 
 const followingOfUser = async (req, res) => {
   const { id } = req.params;
-  const { user } = req;
+  const user = req.user;
   const limit = parseInt(req.query.limit) || 10;
   const skip = parseInt(req.query.skip) || 0;
 

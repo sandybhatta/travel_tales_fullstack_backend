@@ -4,7 +4,7 @@ import { uploadToCloudinary } from "../../utils/cloudinary.js";
 
 
 const updateProfile= async(req,res)=>{
-    const {user}=req
+    const user=req.user
     const {name , bio, avatar, city , state, country , interests}=req.body
 
     try{

@@ -3,7 +3,7 @@ import Post from "../../models/post.js";
 const mentionedPost = async(req,res)=>{
 
     try {
-        const { user } = req;
+        const user = req.user;
         const post = await Post.find({
             mentions:user._id
         }).populate([

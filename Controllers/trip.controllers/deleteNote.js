@@ -3,7 +3,7 @@ import Trip from "../../models/trip.js";
 const deleteNote = async()=>{
 
     const { tripId , noteId } =req.params;
-    const { user } =req;
+    const  user  = req.user;
 
     try {
         

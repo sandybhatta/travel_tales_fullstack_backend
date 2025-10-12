@@ -2,7 +2,7 @@ import Trip from "../../models/trip.js";
 import User from "../../models/User.js";
 
 const getTripsByTagname = async (req, res) => {
-  const { user } = req;
+  const user = req.user;
   const { tagname } = req.params;
 
   try {

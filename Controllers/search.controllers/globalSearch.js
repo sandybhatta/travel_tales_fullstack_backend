@@ -3,6 +3,7 @@ import Trip from "../../models/trip.js";
 import Post from "../../models/post.js";
 import SearchHistory from "../../models/SearchHistory.js";
 
+
 const globalSearch = async (req, res) => {
   try {
     const query = req.query.q?.trim().toLowerCase() || "";
@@ -21,6 +22,7 @@ const globalSearch = async (req, res) => {
       user: req.user._id,
       query,
     });
+
     if (existingHistory) {
       existingHistory.updatedAt = new Date();
       await existingHistory.save();
@@ -117,7 +119,7 @@ const globalSearch = async (req, res) => {
 
     
 
-    // ✅ 8️⃣ Return structured response
+   
     res.status(200).json({
       query,
       users,

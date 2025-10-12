@@ -1,6 +1,5 @@
 
 import User from "../../models/User.js";
-import SearchHistory from "../../models/SearchHistory.js";
 import saveSearchHistory from "../../utils/saveSearchHistory.js"
 
 

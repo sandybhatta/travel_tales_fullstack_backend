@@ -3,7 +3,7 @@ import Trip from "../../models/trip.js";
 
 const getinvitedsOfTrip = async(req,res)=>{
 const {tripId} = req.params;
-const {user}=req;
+const user=req.user;
 try {
     if(!tripId){
         return res.status(400).json({message:"no trip id given"})

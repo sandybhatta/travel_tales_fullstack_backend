@@ -3,7 +3,7 @@ import User from "../../models/User.js";
 
 const removeCollaborator = async (req, res) => {
   const { tripId, userId } = req.params;
-  const { user } = req;
+  const user = req.user;
 
   try {
     const collaborator = await User.findById(userId);
