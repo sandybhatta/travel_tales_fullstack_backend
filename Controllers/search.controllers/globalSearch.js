@@ -7,7 +7,7 @@ const globalSearch = async (req, res) => {
   try {
     const query = req.query.q?.trim().toLowerCase() || "";
 
-    // 🧠 1️⃣ If query empty → return user's search history
+    
     if (!query) {
       const history = await SearchHistory.find({ user: req.user._id })
         .sort({ updatedAt: -1 })
@@ -16,7 +16,7 @@ const globalSearch = async (req, res) => {
       return res.status(200).json({ history });
     }
 
-    // 🧠 2️⃣ Save or update search history
+    
     const existingHistory = await SearchHistory.findOne({
       user: req.user._id,
       query,
@@ -34,7 +34,7 @@ const globalSearch = async (req, res) => {
 
     const currentUserId = req.user._id;
 
-    // 🧠 3️⃣ Fetch current user's following + close friends list for privacy filtering
+   
     const currentUser = await User.findById(currentUserId)
       .select("following closeFriends")
       .lean();
@@ -42,7 +42,7 @@ const globalSearch = async (req, res) => {
     const followingIds = currentUser.following.map((id) => id.toString());
     const closeFriendIds = currentUser.closeFriends.map((id) => id.toString());
 
-    // 🧍‍♂️ 4️⃣ Search for Users
+  
     const users = await User.find({
       $or: [
         { username: { $regex: query, $options: "i" } },
@@ -55,7 +55,7 @@ const globalSearch = async (req, res) => {
       .limit(8)
       .lean();
 
-    // 🧳 5️⃣ Search for Trips respecting privacy
+   
     const trips = await Trip.find({
       $or: [
         { title: { $regex: query, $options: "i" } },
@@ -85,7 +85,7 @@ const globalSearch = async (req, res) => {
       }
     });
 
-    // 📸 6️⃣ Search for Posts respecting privacy
+  
     const posts = await Post.find({
       $or: [
         { caption: { $regex: query, $options: "i" } },
@@ -115,15 +115,7 @@ const globalSearch = async (req, res) => {
       }
     });
 
-    // 🏷️ 7️⃣ Extract matching hashtags
-    const hashtagsSet = new Set();
-    visiblePosts.forEach((post) => {
-      post.hashtags?.forEach((tag) => {
-        if (tag.toLowerCase().includes(query)) hashtagsSet.add(tag.toLowerCase());
-      });
-    });
-
-    const hashtags = Array.from(hashtagsSet).slice(0, 10);
+    
 
     // ✅ 8️⃣ Return structured response
     res.status(200).json({
@@ -131,11 +123,10 @@ const globalSearch = async (req, res) => {
       users,
       trips: visibleTrips,
       posts: visiblePosts,
-      hashtags,
     });
   } catch (error) {
     console.error("Error in globalSearch:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error in Search " });
   }
 };
 
