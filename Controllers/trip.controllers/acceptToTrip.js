@@ -1,4 +1,4 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 
 const acceptToTrip = async (req, res) => {
   const { tripId } = req.params;

@@ -1,4 +1,4 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 
 const addPostToTrip = async (req, res) => {
   try {

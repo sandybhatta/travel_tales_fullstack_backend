@@ -1,6 +1,6 @@
 import Post from "../../models/post.js";
 import { uploadToCloudinary } from "../../utils/cloudinary.js";
-import Trip from "../../models/trip.js"
+import Trip from "../../models/Trip.js"
 import User from "../../models/User.js"
 
 const createPost = async (req, res) => {

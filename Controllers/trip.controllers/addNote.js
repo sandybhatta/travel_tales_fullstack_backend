@@ -1,4 +1,4 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 
 const addNote = async(req,res)=>{
     const{body, isPinned}=req.body

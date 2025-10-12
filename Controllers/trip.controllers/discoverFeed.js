@@ -1,5 +1,5 @@
 import Post from "../../models/post.js";
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 import User from "../../models/User.js";
 
 const discoverFeed = async (req, res) => {

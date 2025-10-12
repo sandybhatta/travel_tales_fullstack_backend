@@ -1,4 +1,4 @@
-import Trip from "../../models/trip.js"
+import Trip from "../../models/Trip.js"
 
 import cloudinary, { uploadToCloudinary } from "../../utils/cloudinary.js";
 const editTrip = async(req,res)=>{

@@ -32,3 +32,4 @@ async function saveSearchHistory(userId, query, type = "user") {
       console.error("saveSearchHistory error:", err);
     }
   }
+  export default saveSearchHistory

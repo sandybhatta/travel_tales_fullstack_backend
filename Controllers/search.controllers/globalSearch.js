@@ -1,5 +1,5 @@
 import User from "../../models/User.js";
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 import Post from "../../models/post.js";
 import SearchHistory from "../../models/SearchHistory.js";
 

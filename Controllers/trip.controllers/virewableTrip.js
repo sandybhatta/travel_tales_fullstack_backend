@@ -1,4 +1,4 @@
-import Trip from "../../models/trip.js";
+import Trip from "../../models/Trip.js";
 import User from "../../models/User.js";
 
 const viewableTrip = async (req, res) => {
