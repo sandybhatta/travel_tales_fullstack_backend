@@ -6,6 +6,7 @@ import searchPosts from "../Controllers/search.controllers/searchPosts.js";
 import searchTrips from "../Controllers/search.controllers/searchTrips.js";
 import history from "../Controllers/search.controllers/history.js";
 import deleteOneSearch from "../Controllers/search.controllers/deleteOneSearch.js";
+import deleteAllSearch from "../Controllers/search.controllers/deleteAllSearch.js";
 
 
 const router = express.Router()
@@ -23,7 +24,7 @@ router.get("/history" , protect , history )
 
 router.delete('/history/:id' , protect , deleteOneSearch)
 
-
+router.delete('/history' , protect , deleteAllSearch)
 
 
 export default router;
