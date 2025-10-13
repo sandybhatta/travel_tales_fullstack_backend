@@ -5,19 +5,25 @@ import searchUsers from "../Controllers/search.controllers/Searchusers.js";
 import searchPosts from "../Controllers/search.controllers/searchPosts.js";
 import searchTrips from "../Controllers/search.controllers/searchTrips.js";
 import history from "../Controllers/search.controllers/history.js";
+import deleteOneSearch from "../Controllers/search.controllers/deleteOneSearch.js";
 
 
 const router = express.Router()
 
 router.get("/", protect, globalSearch)
 
-router.get("/history" , protect , history )
 
 router.get("/users" , protect , searchUsers)
 
 router.get("/posts" , protect , searchPosts)
 
 router.get("/trips" , protect , searchTrips)
+
+router.get("/history" , protect , history )
+
+router.delete('/history/:id' , protect , deleteOneSearch)
+
+
 
 
 export default router;
