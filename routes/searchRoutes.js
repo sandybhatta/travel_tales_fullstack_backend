@@ -4,10 +4,14 @@ import globalSearch from "../Controllers/search.controllers/globalSearch.js";
 import searchUsers from "../Controllers/search.controllers/Searchusers.js";
 import searchPosts from "../Controllers/search.controllers/searchPosts.js";
 import searchTrips from "../Controllers/search.controllers/searchTrips.js";
+import history from "../Controllers/search.controllers/history.js";
+
 
 const router = express.Router()
 
 router.get("/", protect, globalSearch)
+
+router.get("/history" , protect , history )
 
 router.get("/users" , protect , searchUsers)
 

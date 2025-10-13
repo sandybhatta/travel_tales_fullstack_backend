@@ -5,10 +5,10 @@ async function saveSearchHistory(userId, query, type = "user") {
     if (!userId || !query) return;
   
     try {
-      // normalize query to trimmed string
+      
       const normalized = String(query).trim();
   
-      // If already exists, update createdAt to now
+      
       const existing = await SearchHistory.findOne({ user: userId, query: normalized, type });
       if (existing) {
         existing.createdAt = new Date();
@@ -18,7 +18,7 @@ async function saveSearchHistory(userId, query, type = "user") {
   
       await SearchHistory.create({ user: userId, query: normalized, type });
   
-      // Keep only the latest 20 entries
+      
       const total = await SearchHistory.countDocuments({ user: userId });
       if (total > 20) {
         const toRemove = await SearchHistory.find({ user: userId })

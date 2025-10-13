@@ -16,7 +16,7 @@ const searchHistorySchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["user", "post", "trip", "tag", "place", "general"],
+      enum: ["user", "post", "trip", "general"],
       default: "general",
     },
     createdAt: {
