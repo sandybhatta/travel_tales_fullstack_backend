@@ -1,4 +1,6 @@
 import SearchHistory from "../models/SearchHistory.js"
+
+
 async function saveSearchHistory(userId, query, type = "user") {
     if (!userId || !query) return;
   
