@@ -1,5 +1,5 @@
 import Comment from "../../models/comment.js";
-import Post from "../../models/post.js";
+import Post from "../../models/Post.js";
 
 const getRootComment = async (req, res) => {
   try {

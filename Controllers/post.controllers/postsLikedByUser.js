@@ -1,4 +1,4 @@
-import Post from "../../models/post.js";
+import Post from "../../models/Post.js";
 
 const postsLikedByUser = async (req, res) => {
   try {

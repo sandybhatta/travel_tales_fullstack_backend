@@ -1,5 +1,5 @@
 import Trip from "../../models/Trip.js";
-import Post from "../../models/post.js";
+import Post from "../../models/Post.js";
 
 const highlightPost = async (req, res) => {
   try {

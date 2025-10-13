@@ -1,5 +1,5 @@
 
-import Post from "../../models/post.js";
+import Post from "../../models/Post.js";
 
 const toggleLikePost = async (req, res) => {
   try {
