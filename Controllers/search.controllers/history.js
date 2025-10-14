@@ -15,7 +15,6 @@ const history = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      count: history.length,
       history, 
     });
   } catch (error) {

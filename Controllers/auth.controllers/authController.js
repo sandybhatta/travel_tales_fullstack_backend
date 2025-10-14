@@ -184,7 +184,7 @@ export const refresh = async (req, res) => {
     const existingToken = await Token.findOne({ token: oldToken });
 
     if (!existingToken) {
-      await Token.deleteMany({ userId: payload.userId }); // Token reuse detection
+      await Token.deleteMany({ userId: payload.userId }); 
       return res.status(403).json({ message: 'Token reuse detected. Re-login required.' });
     }
 

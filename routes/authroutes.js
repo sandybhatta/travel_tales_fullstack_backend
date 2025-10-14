@@ -69,7 +69,7 @@ router.post("/resend-otp", resendOtp)
 
 
 // 3. refresh route for token rotation
-router.post("/refresh", refresh);
+router.get("/refresh", refresh);
 
 // 4 logout the user
 router.post("/logout", protect, logoutuser);

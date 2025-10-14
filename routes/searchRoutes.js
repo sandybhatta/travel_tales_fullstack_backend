@@ -27,4 +27,5 @@ router.delete('/history/:id' , protect , deleteOneSearch)
 router.delete('/history' , protect , deleteAllSearch)
 
 
+
 export default router;

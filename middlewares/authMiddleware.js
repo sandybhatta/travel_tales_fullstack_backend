@@ -24,7 +24,7 @@ export const protect = async (req, res, next) => {
       const payload = verifyToken(token, process.env.JWT_ACCESS_SECRET);
   
       // 3. Check if user still exists
-      const user = await User.findById(payload._id).select("-password");
+      const user = await User.findById(payload.userId).select("-password");
       if (!user) {
         return res.status(401).json({ message: "User no longer exists" });
       }
