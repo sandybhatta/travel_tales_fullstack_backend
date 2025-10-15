@@ -1,8 +1,8 @@
 import User from "../../models/User.js";
-import Comment from "../../models/comment.js";
+import Comment from "../../models/Comment.js";
 import Post from "../../models/Post.js";
 import Trip from "../../models/Trip.js";
-import Token from "../../models/token.js"; 
+import Token from "../../models/Token.js"; 
 
 
 import { deleteCommentThread } from "../../utils/deleteCommentThread.js";

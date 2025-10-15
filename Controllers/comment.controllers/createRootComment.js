@@ -1,5 +1,5 @@
 import Post from "../../models/Post.js";
-import Comment from "../../models/comment.js";
+import Comment from "../../models/Comment.js";
 import User from "../../models/User.js";
 
 const createRootComment = async (req, res) => {

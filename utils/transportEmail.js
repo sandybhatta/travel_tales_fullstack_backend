@@ -1,42 +1,69 @@
+
+import axios from "axios";
 import ejs from "ejs";
 import path from "path";
-import nodemailer from "nodemailer";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import dotenv from "dotenv";
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
 dotenv.config();
 
-// 👇 Fix __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// transport smtp settings
-const transport = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
-
-// function to send verification  email using nodemailer
+/**
+ * Send verification email via Brevo REST API
+ */
 export async function sendEmail(email, username, token, message) {
-  console.log(path.join(__dirname));
-  const templatePath = path.join(__dirname, "../emails/verifyEmail.ejs");
+  try {
+    
+    const templatePath = path.join(__dirname, "../emails/verifyEmail.ejs");
+    const verifyLink = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
 
-  const verifyLink = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
-  
-  
-  const html = await ejs.renderFile(templatePath, { username, verifyLink,message });
+   
+    const htmlContent = await ejs.renderFile(templatePath, {
+      username,
+      verifyLink,
+      message,
+    });
 
-  await transport.sendMail({
-    from: `TravelTales <${process.env.SMTP_USER}>`,
-    to: email,
-    bcc: `${process.env.SMTP_USER}`,
-    subject: `Verify your email, ${username}`,
-    html,
-  });
+    
+    const emailPayload = {
+      sender: {
+        name: "TravelTales Support",
+        email: "noreply@traveltalesapp.in", 
+      },
+      to: [
+        {
+          email,
+        },
+      ],
+      subject: `Verify your email, ${username}`,
+      htmlContent,
+    };
+
+    console.log(" Sending verification email via HTTPS API...");
+    console.log("Payload:", emailPayload);
+
+   
+    const response = await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      emailPayload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": process.env.BREVO_API_KEY, 
+        },
+      }
+    );
+
+    console.log(
+      ` Verification email sent via Brevo API: ${response.data.messageId || "Success"}`
+    );
+  } catch (error) {
+    console.error(
+      " Email sending failed via Brevo API:",
+      error.response?.data || error.message
+    );
+    throw new Error("Email could not be sent via Brevo API");
+  }
 }

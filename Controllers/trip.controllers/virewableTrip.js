@@ -27,7 +27,7 @@ const viewableTrip = async (req, res) => {
     const baseQuery = {
       $or: [
         { user: user._id },
-        { acceptedFriends: user._id },
+        { "acceptedFriends.user": user._id },
         { invitedFriends: user._id },
         { visibility: "public" },
         {

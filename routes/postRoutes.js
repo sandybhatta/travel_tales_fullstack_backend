@@ -4,7 +4,7 @@ import { upload } from "../middlewares/multer.js";
 import createPost from "../Controllers/post.controllers/createPost.js";
 import getPostDetails from "../Controllers/post.controllers/getPostDetails.js";
 import editPost from "../Controllers/post.controllers/editPost.js";
-import sharePost from "../Controllers/post.controllers/sharePost.js";
+import sharePost from "../Controllers/post.controllers/sharepost.js";
 import toggleLikePost from "../Controllers/post.controllers/togglelikePost.js";
 import getLikesOfPost from "../Controllers/post.controllers/getLikesOfPost.js";
 import postsLikedByUser from "../Controllers/post.controllers/postsLikedByUser.js";

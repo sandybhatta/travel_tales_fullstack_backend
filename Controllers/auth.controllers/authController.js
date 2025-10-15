@@ -4,7 +4,7 @@ import { sendEmail } from "../../utils/transportEmail.js";
 import { sendOTPEmail } from "../../utils/sendOTPemail.js";
 import  OtpToken from "../../models/Otp.js";
 import {verifyToken} from "../../utils/tokenCreate.js"
-import Token from "../../models/token.js"
+import Token from "../../models/Token.js"
 import dotenv from "dotenv"
 import { sendDeactivateEmail } from "../../utils/sendDeactivateEmail.js";
 
@@ -209,8 +209,9 @@ export const refresh = async (req, res) => {
 
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      secure: false,             
+      sameSite: "lax",            
+      path: "/",                 
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
