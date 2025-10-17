@@ -24,7 +24,7 @@ const tripsOfUser = async (req, res) => {
 
     // Self case — show all
     if (userId.toString() === user._id.toString()) {
-      return res.status(200).json({ trips: allTrips, count: allTrips.length, owner:trip.isOwnedBy(user._id) });
+      return res.status(200).json({ trips: allTrips, count: allTrips.length });
     }
 
     // Categorize trips by visibility
