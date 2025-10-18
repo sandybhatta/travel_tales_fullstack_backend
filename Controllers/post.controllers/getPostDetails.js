@@ -1,6 +1,6 @@
 import Post from "../../models/Post.js";
-import Comment from "../../models/comment.js";
-import Trip from "../../models/Trip.js";
+import Comment from "../../models/Comment.js";
+
 
 const getPostDetails = async (req, res) => {
   try {

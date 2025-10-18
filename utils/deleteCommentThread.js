@@ -1,5 +1,5 @@
 // utils/deleteCommentThread.js
-import Comment from "../models/comment.js";
+import Comment from "../models/Comment.js";
 
 export const deleteCommentThread = async (commentId) => {
   // Step 1: Find and delete the comment
