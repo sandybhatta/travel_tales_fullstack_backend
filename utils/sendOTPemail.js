@@ -3,24 +3,25 @@ import ejs from "ejs";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
-dotenv.config()
+dotenv.config();
 
 // __dirname fix for ES Module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// SMTP transporter config
+// Nodemailer transporter using Brevo SMTP
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: 587,
-  secure: false,
+  host: process.env.SMTP_HOST,       // Brevo SMTP host
+  port: parseInt(process.env.SMTP_PORT) || 587,
+  secure: false,                     // true only if port=465
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
+    user: process.env.SMTP_USER,     // Brevo SMTP login
+    pass: process.env.SMTP_PASSWORD, // Brevo SMTP password
   },
 });
 
-export const sendOTPEmail = async (email, username, otp,type='login') => {
+// Function to send OTP email
+export const sendOTPEmail = async (email, username, otp, type = "login") => {
   try {
     const templatePath = path.join(__dirname, "../emails/otp.ejs");
 
@@ -30,20 +31,23 @@ export const sendOTPEmail = async (email, username, otp,type='login') => {
       expiresIn: 10,
     });
 
+    const subject =
+      type === "login"
+        ? "Your TravelTales OTP for Login"
+        : "🔐 Your TravelTales OTP for Password Reset";
 
-
-    const subject= type ==='login'? "Your TravelTales OTP for Login" :"🔐 Your TravelTales OTP for forget password"
     const mailOptions = {
-      from: `"TravelTales Support" <${process.env.SMTP_USER}>`,
+      from: `"TravelTales Support" <${process.env.SMTP_USER}>`, // Must match verified Brevo sender
       to: email,
-      bcc: process.env.SMTP_USER, // For log copy
+      bcc: process.env.SMTP_USER,                                   // optional log copy
       subject,
       html,
     };
 
     await transporter.sendMail(mailOptions);
+    console.log(`✅ OTP email sent to ${email}`);
   } catch (error) {
-    console.error("Email Sending Failed:", error.response || error);
-    throw new Error("OTP email could not be sent");
+    console.error("❌ Email sending failed:", error.response || error);
+    throw new Error("OTP email could not be sent via Brevo SMTP.");
   }
 };
