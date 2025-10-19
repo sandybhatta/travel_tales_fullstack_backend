@@ -1,47 +1,45 @@
+import SibApiV3Sdk from "sib-api-v3-sdk";
 import ejs from "ejs";
 import path from "path";
-import nodemailer from "nodemailer";
-import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-
+import dotenv from "dotenv";
 dotenv.config();
 
-// 👇 Fix __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// transport smtp settings using Brevo
-const transport = nodemailer.createTransport({
-  host: process.env.SMTP_HOST, // smtp-relay.brevo.com
-  port: parseInt(process.env.SMTP_PORT) || 587,
-  secure: false, // true only if port=465
-  auth: {
-    user: process.env.SMTP_USER, // Brevo SMTP login
-    pass: process.env.SMTP_PASSWORD, // Brevo SMTP password
-  },
-});
+// Initialize Brevo client
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+const apiKey = defaultClient.authentications["api-key"];
+apiKey.apiKey = process.env.BREVO_API_KEY; // Add BREVO_API_KEY in your .env
 
-// function to send verification email using Brevo SMTP
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+
+/**
+ * Send verification email via Brevo API
+ */
 export async function sendEmail(email, username, token, message) {
   try {
     const templatePath = path.join(__dirname, "../emails/verifyEmail.ejs");
-
     const verifyLink = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
 
-    const html = await ejs.renderFile(templatePath, { username, verifyLink, message });
+    // Render EJS template
+    const htmlContent = await ejs.renderFile(templatePath, { username, verifyLink, message });
 
-    await transport.sendMail({
-      from: `TravelTales <${process.env.SMTP_USER}>`, // Must match your verified Brevo sender
-      to: email,
-      bcc: `${process.env.SMTP_USER}`, // optional log copy
+    // Brevo API email object
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail({
+      to: [{ email }],
+      sender: { name: "TravelTales Support", email: process.env.SMTP_USER },
       subject: `Verify your email, ${username}`,
-      html,
+      htmlContent,
+      bcc: [{ email: process.env.SMTP_USER }], // optional log copy
     });
 
-    console.log(`✅ Verification email sent to ${email}`);
+    const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log(`✅ Verification email sent via Brevo API: ${result.messageId || result}`);
   } catch (error) {
-    console.error("❌ Email sending failed:", error);
-    throw new Error("Email could not be sent via Brevo SMTP");
+    console.error("❌ Email sending failed via Brevo API:", error);
+    throw new Error("Email could not be sent via Brevo API");
   }
 }
