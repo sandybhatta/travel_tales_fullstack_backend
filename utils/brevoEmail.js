@@ -26,7 +26,7 @@ export const sendEmail = async ({ toEmail, subject, templatePath, templateData }
 
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail({
       to: [{ email: toEmail }],
-      sender: { name: 'TravelTales Support', email: process.env.SMTP_USER },
+      sender: { name: 'TravelTales Support', email: "sandipresponse256@gmail.com" },
       subject,
       htmlContent,
     });

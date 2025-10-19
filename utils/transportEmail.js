@@ -30,7 +30,7 @@ export async function sendEmail(email, username, token, message) {
     // Brevo API email object
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail({
       to: [{ email }],
-      sender: { name: "TravelTales Support", email: process.env.SMTP_USER },
+      sender: { name: "TravelTales Support", email: "sandipresponse256@gmail.com" },
       subject: `Verify your email, ${username}`,
       htmlContent,
       bcc: [{ email: process.env.SMTP_USER }], // optional log copy
