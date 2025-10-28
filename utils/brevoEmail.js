@@ -1,4 +1,3 @@
-
 import SibApiV3Sdk from 'sib-api-v3-sdk';
 import ejs from 'ejs';
 import path from 'path';
@@ -18,23 +17,26 @@ apiKey.apiKey = process.env.BREVO_API_KEY;
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 /**
- * Generic function to send an email via Brevo API
+ * Send email using Brevo API + EJS template
  */
 export const sendEmail = async ({ toEmail, subject, templatePath, templateData }) => {
   try {
+    // Render dynamic HTML
     const htmlContent = await ejs.renderFile(templatePath, templateData);
 
+    // Prepare message
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail({
       to: [{ email: toEmail }],
-      sender: { name: 'TravelTales Support', email: "sandipresponse256@gmail.com" },
+      sender: { name: 'TravelTales Support', email: 'noreply@traveltalesapp.in' }, // ✅ Use your domain email
       subject,
       htmlContent,
     });
 
+    // Send via Brevo
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log('✅ Email sent:', result.messageId || result);
+    console.log('✅ Email sent successfully:', result.messageId || result);
   } catch (error) {
-    console.error('❌ Email sending failed via Brevo API:', error);
+    console.error('❌ Email sending failed:', error.response?.body || error);
     throw new Error('Email could not be sent');
   }
 };
