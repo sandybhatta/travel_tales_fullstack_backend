@@ -23,9 +23,9 @@ export const sendDeactivateEmail = async (email, username) => {
       },
     });
 
-    console.log(`✅ Deactivation email sent to ${email}`);
+    console.log(` Deactivation email sent to ${email}`);
   } catch (err) {
-    console.error("❌ Failed to send deactivation email via Brevo API:", err.message);
+    console.error(" Failed to send deactivation email via Brevo API:", err.message);
     throw new Error("Deactivation email failed via Brevo API.");
   }
 };

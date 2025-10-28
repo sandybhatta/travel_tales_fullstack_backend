@@ -23,9 +23,9 @@ export const sendReactivationEmail = async (email, username) => {
       },
     });
 
-    console.log(`✅ Reactivation email sent to ${email}`);
+    console.log(` Reactivation email sent to ${email}`);
   } catch (err) {
-    console.error("❌ Failed to send reactivation email via Brevo API:", err.message);
+    console.error(" Failed to send reactivation email via Brevo API:", err.message);
     throw new Error("Reactivation email failed via Brevo API.");
   }
 };

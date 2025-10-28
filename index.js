@@ -34,7 +34,7 @@ app.use(cors({
 }));
 
 
-
+console.log("BREVO_API_KEY exists:", !!process.env.BREVO_API_KEY);
 
 
 app.get("/", (req, res) => {

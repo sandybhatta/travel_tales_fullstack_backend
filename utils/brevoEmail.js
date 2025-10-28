@@ -1,42 +1,60 @@
-import SibApiV3Sdk from 'sib-api-v3-sdk';
-import ejs from 'ejs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import dotenv from 'dotenv';
+// utils/brevoEmail.js
+import axios from "axios";
+import ejs from "ejs";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import dotenv from "dotenv";
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Initialize Brevo client
-const defaultClient = SibApiV3Sdk.ApiClient.instance;
-const apiKey = defaultClient.authentications['api-key'];
-apiKey.apiKey = process.env.BREVO_API_KEY;
-
-const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-
 /**
- * Send email using Brevo API + EJS template
+ * Send email using Brevo REST API + EJS template
  */
 export const sendEmail = async ({ toEmail, subject, templatePath, templateData }) => {
   try {
-    // Render dynamic HTML
+    // 1️⃣ Render EJS template to HTML
     const htmlContent = await ejs.renderFile(templatePath, templateData);
 
-    // Prepare message
-    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail({
-      to: [{ email: toEmail }],
-      sender: { name: 'TravelTales Support', email: 'noreply@traveltalesapp.in' }, // ✅ Use your domain email
-      subject,
-      htmlContent,
-    });
+    // 2️⃣ Build the payload exactly as Brevo API expects
+    const emailPayload = {
+      sender: {
+        name: "TravelTales Support",
+        email: "noreply@traveltalesapp.in", // your verified Brevo sender email
+      },
+      to: [
+        {
+          email: toEmail,
+        },
+      ],
+      subject: subject,
+      htmlContent: htmlContent,
+    };
 
-    // Send via Brevo
-    const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log('✅ Email sent successfully:', result.messageId || result);
+    console.log("🟢 Sending email via Brevo REST API...");
+    console.log("Payload:", emailPayload);
+
+    // 3️⃣ Send POST request to Brevo API
+    const response = await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      emailPayload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": process.env.BREVO_API_KEY, // from .env (also set in Render)
+        },
+      }
+    );
+
+    console.log("✅ Email sent successfully:", response.data);
+    return response.data;
   } catch (error) {
-    console.error('❌ Email sending failed:', error.response?.body || error);
-    throw new Error('Email could not be sent');
+    console.error(
+      "❌ Email sending failed:",
+      error.response?.data || error.message
+    );
+    throw new Error("Email could not be sent");
   }
 };

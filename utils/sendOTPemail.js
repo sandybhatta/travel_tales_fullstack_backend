@@ -28,9 +28,9 @@ export const sendOTPEmail = async (email, username, otp, type = "login") => {
       },
     });
 
-    console.log(`✅ OTP email sent to ${email}`);
+    console.log(` OTP email sent to ${email}`);
   } catch (error) {
-    console.error("❌ Email sending failed via Brevo API:", error.message);
+    console.error(" Email sending failed via Brevo API:", error.message);
     throw new Error("OTP email could not be sent via Brevo API.");
   }
 };

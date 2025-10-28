@@ -22,9 +22,9 @@ export const sendPasswordChangedEmail = async (name, email) => {
       },
     });
 
-    console.log(`✅ Password change email sent to ${email}`);
+    console.log(` Password change email sent to ${email}`);
   } catch (err) {
-    console.error("❌ Failed to send password change email via Brevo API:", err.message);
+    console.error(" Failed to send password change email via Brevo API:", err.message);
     throw new Error("Password change email failed via Brevo API.");
   }
 };

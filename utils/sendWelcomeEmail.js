@@ -21,9 +21,9 @@ export const sendWelcomeEmail = async (user) => {
       },
     });
 
-    console.log(`✅ Welcome email sent to ${user.email}`);
+    console.log(` Welcome email sent to ${user.email}`);
   } catch (error) {
-    console.error("❌ Welcome email failed via Brevo API:", error.message);
+    console.error(" Welcome email failed via Brevo API:", error.message);
     throw new Error("Could not send welcome email via Brevo API");
   }
 };
