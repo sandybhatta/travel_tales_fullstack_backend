@@ -31,7 +31,7 @@ app.use(cookieParser());
 const allowedOrigins = [
   process.env.CLIENT_URL,             
   "https://www.traveltalesapp.in",     
-  "http://localhost:5173",        
+  "https://localhost:5173",        
 ];
 
 app.use(cors({
