@@ -1,6 +1,6 @@
 import Trip from "../../models/Trip.js";
 
-const deleteNote = async()=>{
+const deleteNote = async(req,res)=>{
 
     const { tripId , noteId } =req.params;
     const  user  = req.user;
@@ -31,12 +31,7 @@ const deleteNote = async()=>{
 
         return res.status(200).json({
             success:true,
-            notes:trip.notes.sort((a,b)=>{
-                if(a.isPinned !== b.isPinned){
-                    return b.isPinned - a.isPinned
-                }
-                return new Date(b.createdAt) - new Date(a.createdAt)
-            })
+            
         })
 
     } catch (error) {

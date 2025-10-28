@@ -10,7 +10,7 @@ export const sendDeactivateEmail = async (email, username) => {
   try {
     const templatePath = path.join(__dirname, "../emails/accountDeactivated.ejs");
 
-    const loginUrl = `${process.env.CLIENT_URL}/login`;
+    const loginUrl = `${process.env.CLIENT_LIVE_URL}/login`;
 
     // Call Brevo API utility
     await sendEmail({

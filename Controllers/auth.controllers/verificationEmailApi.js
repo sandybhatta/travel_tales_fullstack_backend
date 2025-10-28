@@ -31,7 +31,6 @@ export const verifyEmail = async (req, res) => {
     user.isVerified = true;
     user.emailVerifyToken = undefined;
     user.emailVerifyTokenExpires = undefined;
-    user.registersAt = new Date()
     await user.save();
 
     // Optional: send welcome email here

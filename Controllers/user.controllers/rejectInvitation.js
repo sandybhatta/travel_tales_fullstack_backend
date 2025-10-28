@@ -22,7 +22,7 @@ const rejectInvitation = async (req, res) => {
       (id) => id.toString() !== user._id.toString()
     );
 
-    await trip.save(); // ✅ Save the updated trip
+    await trip.save(); //  Save the updated trip
 
     return res.status(200).json({ success: true, message: "Invitation rejected" });
   } catch (error) {

@@ -209,10 +209,11 @@ export const refresh = async (req, res) => {
 
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
-      secure: false,             
-      sameSite: "lax",            
-      path: "/",                 
+      secure: true,          
+      sameSite: "none",      
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain: ".traveltalesapp.in"
     });
 
     res.json({ accessToken: newAccessToken });
@@ -452,7 +453,8 @@ return res.status(500).json({ message: "Something went wrong while deactivating 
 
 export const reactivateUser =  async(req,res)=>{
   
-    const {userId}=req.body
+    const user=req.user
+    const userId = user._id;
 
     try{
       const user = await User.findById(userId)
@@ -485,6 +487,6 @@ export const reactivateUser =  async(req,res)=>{
 
 export const getUserInfo =  async(req,res)=>{
   
-    const {userId}=req.body
+    const user= req.user;
 
 }

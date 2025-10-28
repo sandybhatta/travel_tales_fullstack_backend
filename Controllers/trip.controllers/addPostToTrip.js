@@ -1,55 +1,75 @@
+
+import Post from "../../models/Post.js";
 import Trip from "../../models/Trip.js";
 
 const addPostToTrip = async (req, res) => {
+ 
+
   try {
     const { tripId } = req.params;
-    const { postId, captionOverride, dayNumber, isHighlighted } = req.body;
+    const { posts } = req.body;
     const userId = req.user._id;
 
-    if (!postId) {
-      return res.status(400).json({ error: "postId is required" });
+    if (!Array.isArray(posts) || posts.length === 0) {
+      return res.status(400).json({ message: "Posts array is required" });
     }
 
-    const trip = await Trip.findById(tripId);
+    const trip = await Trip.findById(tripId)
     if (!trip) {
       return res.status(404).json({ message: "Trip not found" });
     }
 
     if (!trip.canPost(req.user)) {
-      return res.status(403).json({ message: "Not allowed to add post to this trip" });
+      return res.status(403).json({ message: "Not allowed" });
     }
 
-    const alreadyExists = trip.posts.some(p => p.post.toString() === postId);
+    const existingPostIds = new Set(
+      trip.posts.map(p => p.post.toString())
+    );
 
-    if (alreadyExists) {
-      return res.status(400).json({ message: "Post already added to this trip" });
+    const newTripPosts = [];
+    const postIdsToUpdate = [];
+
+    for (const post of posts) {
+      if (!post._id) continue;
+
+      if (!existingPostIds.has(post._id.toString())) {
+        newTripPosts.push({
+          post: post._id,
+          dayNumber: post.dayNumber ?? null,
+          isHighlighted: !!post.isHighlighted,
+          highlightedBy: post.isHighlighted ? userId : null,
+        });
+
+        postIdsToUpdate.push(post._id);
+      }
     }
 
-    const postObj = {
-      post: postId,
-      addedBy: userId,
-      captionOverride: captionOverride?.trim(),
-      dayNumber: Number(dayNumber) || undefined,
-      isHighlighted: !!isHighlighted,
-      highlightedBy: isHighlighted ? userId : undefined,
-    };
+    if (postIdsToUpdate.length) {
+      await Post.updateMany(
+        { _id: { $in: postIdsToUpdate } },
+        { $set: { tripId } },
+        
+      );
+    }
 
-    trip.posts.push(postObj);
-
+    trip.posts.push(...newTripPosts);
     await trip.save();
 
+   
+
     return res.status(200).json({
-      message: "Post added to trip successfully",
+      message: "Posts added successfully",
       trip,
     });
 
   } catch (err) {
+    
     return res.status(500).json({
       message: "Internal Server Error",
-      error: error.message,
+      error: err.message,
     });
-  }
+  } 
 };
 
-
-export default addPostToTrip
+export default addPostToTrip;

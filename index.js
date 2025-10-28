@@ -25,11 +25,12 @@ connectDb();
 const app = express();
 
 
-app.use(express.json()); 
+ 
 app.use(cookieParser()); 
 
 const allowedOrigins = [
-  process.env.CLIENT_URL,             
+  process.env.CLIENT_URL,
+  process.env.CLIENT_LIVE_URL,             
   "https://www.traveltalesapp.in",     
   "http://localhost:5173",        
 ];
@@ -57,7 +58,7 @@ app.get("/", (req, res) => {
 
 
 
-
+app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 

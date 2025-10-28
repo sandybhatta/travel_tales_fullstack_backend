@@ -36,8 +36,8 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true, // Will skip for OAuth users
-      select: false, // Don't return password by default
+      required: true, 
+      select: false, 
     },
     avatar: {
       type: String,
@@ -207,23 +207,15 @@ const userSchema = new mongoose.Schema(
   },
 
 
-
-
-
-
-
   {
     timestamps: true, 
   }
 );
 
-
-// indexing for frequest search
+// indexing for frequent search
 
 userSchema.index({ followers: 1 });
 userSchema.index({ following: 1 });
-
-
 
 
 userSchema.pre("save", async function (next) {
@@ -238,11 +230,8 @@ userSchema.pre("save", async function (next) {
   };
 
 
-  // for notifications
- /**
- * Generates a random raw token, hashes & stores it,
- * sets expiry, and returns the raw token for e-mailing.
- */
+  
+ 
 userSchema.methods.createEmailVerificationToken = function () {
   const rawToken = crypto.randomBytes(32).toString("hex"); // 64-char string
   this.emailVerifyToken = crypto
@@ -250,13 +239,10 @@ userSchema.methods.createEmailVerificationToken = function () {
     .update(rawToken)
     .digest("hex");
 
-  // 30 min lifetime (adjust to taste)
   this.emailVerifyTokenExpires = Date.now() + 30 * 60 * 1000;
 
   return rawToken;
-};
-
-  
+};  
 const User = mongoose.model("User", userSchema);
 
 export default User;

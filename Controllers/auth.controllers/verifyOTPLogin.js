@@ -49,10 +49,11 @@ export const verifyOtpLogin = async (req, res) => {
     //  8. Send refresh token in secure httpOnly cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,             
-      sameSite: "lax",            
-      path: "/",                 
+      secure: true,          
+      sameSite: "none",      
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain: ".traveltalesapp.in"
     });
 
     //  9. Send access token + user info

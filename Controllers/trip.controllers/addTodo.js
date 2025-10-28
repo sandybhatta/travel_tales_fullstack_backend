@@ -16,9 +16,7 @@ const addTodo = async (req, res) => {
       return res.status(404).json({ message: "No trip found" });
     }
 
-    if (trip.isCompleted || trip.isArchived) {
-      return res.status(403).json({ message: "Cannot add more tasks." });
-    }
+    
 
     const isOwner = trip.isOwnedBy(user._id);
     const isCollaborator = trip.isFriendAccepted(user._id);
@@ -32,7 +30,7 @@ const addTodo = async (req, res) => {
       if (!assignedUser) {
         return res.status(400).json({ message: "Assigned user does not exist." });
       }
-      if (!trip.isFriendAccepted(assignedTo)) {
+      if (!trip.isFriendAccepted(assignedTo) && !trip.isOwnedBy(assignedTo)) {
         return res.status(400).json({ message: "Assigned user must be an accepted collaborator." });
       }
     }

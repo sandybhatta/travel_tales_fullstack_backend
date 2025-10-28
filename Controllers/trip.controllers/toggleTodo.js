@@ -17,10 +17,7 @@ const toggleTodo = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized, only owner and collaborator have permission" });
     }
 
-    // Optional: Block after finalization
-    if (trip.isFinalized) {
-      return res.status(403).json({ message: "Trip is finalized. Todo list is locked." });
-    }
+  
 
     const todo = trip.todoList.find(todo => todo._id.toString() === todoId);
     if (!todo) {
@@ -32,7 +29,6 @@ const toggleTodo = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Todo toggled successfully",
       
     });
 

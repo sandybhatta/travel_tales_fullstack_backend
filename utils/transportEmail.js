@@ -17,7 +17,7 @@ export async function sendEmail(email, username, token, message) {
   try {
     
     const templatePath = path.join(__dirname, "../emails/verifyEmail.ejs");
-    const verifyLink = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
+    const verifyLink = `${process.env.CLIENT_LIVE_URL}/verify-email?token=${token}`;
 
    
     const htmlContent = await ejs.renderFile(templatePath, {

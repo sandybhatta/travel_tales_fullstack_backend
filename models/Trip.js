@@ -147,19 +147,9 @@ const tripSchema = new mongoose.Schema({
           ref: "Post",
           required: true,
         },
-        addedBy: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
         addedAt: {
           type: Date,
           default: Date.now,
-        },
-        captionOverride: {
-          type: String,
-          trim: true,
-          maxlength: 1000,
         },
         dayNumber: {
           type: Number, // e.g., Day 1, Day 2 of the trip
@@ -172,7 +162,7 @@ const tripSchema = new mongoose.Schema({
         },
         highlightedBy: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "User", // usually trip owner
+          ref: "User", 
           default: null,
         },
     }
@@ -219,13 +209,7 @@ tripSchema.virtual("duration").get(function () {
   
     return durationDays;
   });
-  // to get the duration days in human readable text
-tripSchema.virtual("durationText").get(function () {
-    const duration = this.duration;
-    if (duration === 0) return "0 days";
-    if (duration === 1) return "1 day";
-    return `${duration} days`;
-  });
+
   
 
 // what is the trip status
