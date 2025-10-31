@@ -6,7 +6,7 @@ import User from "../../models/User.js"
 const createPost = async (req, res) => {
   try {
     const user = req.user;
-    const { caption, taggedUsers = [], tripId, location ,visibility} = req.body;
+    const { caption, taggedUsers = [], tripId, location, visibility } = req.body;
 
     if (!caption && (!req.files || req.files.length === 0)) {
       return res.status(400).json({ message: "Post must have either caption or media." });

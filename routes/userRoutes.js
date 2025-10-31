@@ -27,6 +27,7 @@ import searchMentionableUser from "../Controllers/user.controllers/searchMention
 import getAllInvitedTrips from "../Controllers/user.controllers/getAllInvitedTrips.js"
 import getAllAcceptedTrips from "../Controllers/user.controllers/getAllAcceptedTrips.js"
 import rejectInvitation from "../Controllers/user.controllers/rejectInvitation.js"
+import getUsersToFollow from "../Controllers/user.controllers/getUsersToFollow.js"
 
 
 
@@ -137,7 +138,7 @@ router.delete("/:tripId/reject-invitation", protect, rejectInvitation)
 router.get("/accepted-trips", protect, getAllAcceptedTrips)
 
 
-
+router.get("/users" , protect , getUsersToFollow)
 
 
 
