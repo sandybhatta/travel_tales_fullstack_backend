@@ -29,7 +29,8 @@ app.use(express.json());
 app.use(cookieParser()); 
 
 const allowedOrigins = [
-  process.env.CLIENT_URL,             
+  process.env.CLIENT_URL,
+  process.env.CLIENT_LIVE_URL,             
   "https://www.traveltalesapp.in",     
   "http://localhost:5173",        
 ];

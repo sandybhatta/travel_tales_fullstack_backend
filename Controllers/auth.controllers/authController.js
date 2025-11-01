@@ -207,11 +207,11 @@ export const refresh = async (req, res) => {
     const newAccessToken = getAccessToken(user._id);
     const newRefreshToken = await getRefreshToken(user._id);
 
-    res.cookie("refreshToken", newRefreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,             
-      sameSite: "lax",            
-      path: "/",                 
+      secure: true,          
+      sameSite: "none",      
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 

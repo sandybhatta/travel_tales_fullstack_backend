@@ -10,7 +10,7 @@ const __dirname = dirname(__filename);
 export const sendReactivationEmail = async (email, username) => {
   try {
     const templatePath = path.join(__dirname, "../emails/accountReactivated.ejs");
-    const loginUrl = `${process.env.CLIENT_URL}/login`;
+    const loginUrl = `${process.env.CLIENT_LIVE_URL}/login`;
 
     // Use Brevo API utility
     await sendEmail({
