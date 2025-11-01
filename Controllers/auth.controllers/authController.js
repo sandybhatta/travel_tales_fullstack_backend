@@ -207,7 +207,7 @@ export const refresh = async (req, res) => {
     const newAccessToken = getAccessToken(user._id);
     const newRefreshToken = await getRefreshToken(user._id);
 
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: true,          
       sameSite: "none",      
