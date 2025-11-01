@@ -53,6 +53,7 @@ export const verifyOtpLogin = async (req, res) => {
       sameSite: "none",      
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain: ".traveltalesapp.in"
     });
 
     //  9. Send access token + user info
