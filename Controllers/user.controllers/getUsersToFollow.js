@@ -15,6 +15,7 @@ const getUsersToFollow = async(req,res)=>{
 
          const userToFollow = await User.find({
             _id:{$nin:notRecommendeduser},
+            isVerified:true,
             isDeactivated:false,
             isBanned:false,
             blockedUsers:{$nin:[user._id]}

@@ -137,7 +137,7 @@ router.delete("/:tripId/reject-invitation", protect, rejectInvitation)
 // to get the list of all accepted trips
 router.get("/accepted-trips", protect, getAllAcceptedTrips)
 
-
+//  get only users from db to follow them
 router.get("/users" , protect , getUsersToFollow)
 
 
