@@ -79,8 +79,26 @@ const createTrip = async (req, res) => {
     // 5. Validate tags
     if (tags && tags.length > 0) {
       const allowedTags = new Set([
-        "adventure", "beach", "mountain", "city", "honeymoon", "family",
-        "solo", "friends", "luxury", "budget", "wildlife", "roadtrip", "spiritual"
+        "adventure",
+        "beach",
+        "mountains",
+        "history",
+        "food",
+        "wildlife",
+        "culture",
+        "luxury",
+        "budget",
+        "road_trip",
+        "solo",
+        "group",
+        "trekking",
+        "spiritual",
+        "nature",
+        "photography",
+        "festivals",
+        "architecture",
+        "offbeat",
+        "shopping",
       ]);
       for (const tag of tags) {
         if (!allowedTags.has(tag)) {
