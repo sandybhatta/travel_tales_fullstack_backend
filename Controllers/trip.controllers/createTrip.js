@@ -16,6 +16,28 @@ const createTrip = async (req, res) => {
   }
 
   try {
+
+
+    const fieldsToParse = [
+      "destinations",
+      "expenses",
+      "notes",
+      "todoList",
+      "invitedFriends"
+    ];
+
+    fieldsToParse.forEach((field) => {
+      if (typeof req.body[field] === "string") {
+        try {
+          req.body[field] = JSON.parse(req.body[field]);
+        } catch (err) {
+          req.body[field] = [];
+        }
+      }
+    });
+
+
+
     const {
       title,
       description,
