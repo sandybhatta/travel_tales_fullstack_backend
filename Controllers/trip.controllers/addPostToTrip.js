@@ -46,7 +46,7 @@ const addPostToTrip = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       message: "Internal Server Error",
-      error: error.message,
+      error: err.message,
     });
   }
 };

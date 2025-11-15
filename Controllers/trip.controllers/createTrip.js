@@ -62,7 +62,7 @@ const createTrip = async (req, res) => {
     // 3. Handle coverPhoto upload
     if (req.file && req.file.mimetype.startsWith("image/")) {
       const result = await uploadToCloudinary(
-        req.file,
+        req.file.buffer,
         "/trip/coverPhoto",
         "image"
       );
