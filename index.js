@@ -25,7 +25,7 @@ connectDb();
 const app = express();
 
 
-app.use(express.json()); 
+ 
 app.use(cookieParser()); 
 
 const allowedOrigins = [
@@ -72,7 +72,7 @@ app.use("/api/comment",commentRoutes)
 
 app.use('/api/search',searchRoutes)
 
-
+app.use(express.json());
 
 
 const PORT = process.env.PORT || 5000;
