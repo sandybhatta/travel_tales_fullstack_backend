@@ -58,7 +58,7 @@ app.get("/", (req, res) => {
 
 
 
-
+app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 
@@ -72,7 +72,7 @@ app.use("/api/comment",commentRoutes)
 
 app.use('/api/search',searchRoutes)
 
-app.use(express.json());
+
 
 
 const PORT = process.env.PORT || 5000;
