@@ -11,10 +11,19 @@ const pastTrips = async (req, res) => {
     const trips = await Trip.find({
       user: user._id,
       endDate:{$lt:today}
-    }).sort({ endDate: -1 }); 
+    }).populate(
+      [
+        {
+          path:"user",
+          select:"name username avatar"
+      },{
+        path:"acceptedFriends.user",
+        select:"name username avatar"
+      }
+      ]
+      ).sort({ startDate: 1 }) 
 
     return res.status(200).json({
-      success: true,
       count: trips.length,
       pastTrips: trips
     });

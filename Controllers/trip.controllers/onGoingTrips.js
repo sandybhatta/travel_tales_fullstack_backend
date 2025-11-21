@@ -12,10 +12,19 @@ const onGoingTrips = async (req, res) => {
       user: user._id,
       startDate: { $lte: today },
       endDate:{$gte:today}
-    }).sort({ startDate: -1 }); 
+    }).populate(
+      [
+        {
+          path:"user",
+          select:"name username avatar"
+      },{
+        path:"acceptedFriends.user",
+        select:"name username avatar"
+      }
+      ]
+      ).sort({ startDate: 1 })  
 
     return res.status(200).json({
-      success: true,
       count: trips.length,
       onGoingTrips: trips
     });
