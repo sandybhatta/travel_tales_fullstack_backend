@@ -6,7 +6,6 @@ const getAllInvitedTrips = async (req, res) => {
   try {
     const invitedTrips = await Trip.find({
       invitedFriends: user._id,
-      startDate: { $gte: new Date() }, // Upcoming trips
       isArchived: false,
       isCompleted: false,
     })
@@ -16,7 +15,7 @@ const getAllInvitedTrips = async (req, res) => {
     if (!invitedTrips || invitedTrips.length === 0) {
       return res
         .status(200)
-        .json({ message: "No upcoming trips where you're invited." });
+        .json({ message: "No  trips where you're invited." });
     }
 
     const response = invitedTrips.map((trip) => ({
