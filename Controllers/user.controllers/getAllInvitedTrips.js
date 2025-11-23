@@ -3,8 +3,11 @@ import Trip from "../../models/Trip.js";
 const getAllInvitedTrips = async (req, res) => {
   const user = req.user;
 
+  const blockedUsers = user.blockedUsers.map(id=>id.toString())
+
   try {
     const invitedTrips = await Trip.find({
+      user:{$nin:blockedUsers},
       invitedFriends: user._id,
       isArchived: false,
       isCompleted: false,
