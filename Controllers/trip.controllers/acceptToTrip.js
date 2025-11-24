@@ -14,9 +14,7 @@ const acceptToTrip = async (req, res) => {
       return res.status(404).json({ message: "Trip not found." });
     }
 
-    if (new Date() > trip.endDate) {
-        return res.status(400).json({ message: "The trip has already ended." });
-      }
+   
     if(trip.isArchived || trip.isCompleted ){
         return res.status(400).json({message:"you cannot accept this inviation now"})
     }
