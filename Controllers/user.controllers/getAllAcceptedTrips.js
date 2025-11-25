@@ -11,7 +11,10 @@ try {
     if(!allAcceptedTrips || allAcceptedTrips.length===0){
         return res.status(200).json({message:"you have not a part of a single trip yet"})
     }
-    const response = allAcceptedTrips.map((trip) => ({
+    const response = allAcceptedTrips.map((trip) => {
+
+      const acceptedAtIndex = trip.acceptedFriends.findIndex(friend=>friend.user.toString()=== user._id.toString())
+      return{
         id: trip._id,
         owner: trip.user,
         title: trip.title,
@@ -22,8 +25,10 @@ try {
         duration: trip.duration,
         tags: trip.tags,
         tripStatus:trip.tripStatus,
-        acceptedAt:trip.acceptedFriends.acceptedAt
-      }));
+        acceptedAt:trip.acceptedFriends[acceptedAtIndex].acceptedAt
+      }
+       
+      });
       return res.status(200).json({ trips: response });
   } catch (error) {
     console.error("Error fetching accepted trips:", error);
