@@ -6,7 +6,7 @@ const getAllAcceptedTrips =async(req,res)=>{
 const user = req.user;
 
 try {
-    const allAcceptedTrips = await Trip.find({acceptedFriends:user._id}).populate("user", "name username avatar").sort({startDate:-1})
+    const allAcceptedTrips = await Trip.find({"acceptedFriends.user":user._id}).populate("user", "name username avatar").sort({startDate:-1})
 
     if(!allAcceptedTrips || allAcceptedTrips.length===0){
         return res.status(200).json({message:"you have not a part of a single trip yet"})
