@@ -21,7 +21,8 @@ try {
         destinations: trip.destinations,
         duration: trip.duration,
         tags: trip.tags,
-        tripStatus:trip.tripStatus
+        tripStatus:trip.tripStatus,
+        acceptedAt:trip.acceptedFriends.acceptedAt
       }));
       return res.status(200).json({ trips: response });
   } catch (error) {
