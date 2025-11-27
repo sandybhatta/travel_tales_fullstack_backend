@@ -105,8 +105,7 @@ const discoverFeed = async (req, res) => {
       if (type === "post" && item.tripId) score += 15;
       if (item.hashtags?.some((tag) => interestTags.includes(tag))) score += 10;
       if (item.tags?.some((tag) => interestTags.includes(tag))) score += 15;
-      if (item.isFeatured || item.boosted) score += 25;
-
+      
       const engagement = likes + comments;
       score += Math.min(engagement, 50);
       if (engagement === 0) score -= 10;

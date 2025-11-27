@@ -19,12 +19,12 @@ const getTripById = async (req, res) => {
     const isLiked = trip.likes?.some((id) => id.toString() === user._id.toString());
 
     const currentUserFlags = {
-      isOwner,
-      isCollaborator,
+      userStatus: isOwner ? "owner" : isCollaborator ? "collaborator" : "viewer",
       isInvited: trip.isFriendInvited(user._id),
       isLiked,
       canAddPost: trip.canPost(user),
-      canEditTrip: isOwner,
+      canEditTrip: isOwner || isCollaborator ,
+      canDeleteTrip: isOwner,
       canInviteFriends: isOwner,
       canAccessPrivateData: isOwner || isCollaborator,
     };
@@ -50,7 +50,7 @@ const getTripById = async (req, res) => {
 
     // Process posts
     const posts = await Promise.all(
-      trip.posts.map(async ({ post, addedBy, addedAt, captionOverride, dayNumber, boosted, isHighlighted, highlightedBy }) => {
+      trip.posts.map(async ({ post, addedBy, addedAt, captionOverride, dayNumber, isHighlighted, highlightedBy }) => {
         const likeCount = post.likes?.length || 0;
         const commentCount = post.comments?.length || 0;
 
@@ -68,8 +68,6 @@ const getTripById = async (req, res) => {
           addedAt,
           captionOverride,
           dayNumber,
-          boosted,
-          isBoosted: boosted,
           isHighlighted,
           highlightedBy: highlightedByUser,
           likeCount,
@@ -89,34 +87,15 @@ const getTripById = async (req, res) => {
     }, {});
 
     // Prepare main trip data object
-    const tripData = {
+    const rawTrip = {
       ...trip.toObject(),
-      virtuals: {
-        tripStatus: trip.tripStatus,
-        duration: trip.duration,
-        durationText: trip.durationText,
-        postCount: trip.postCount,
-        destinationCount: trip.destinationCount,
-        isCollaborative: trip.isCollaborative,
-      },
-      currentUser: currentUserFlags,
-      totalLikes: trip.likes?.length || 0,
-      totalComments: trip.totalComments || 0,
-      tags: trip.tags || [],
-      isArchived: trip.isArchived || false,
-      isCompleted: trip.isCompleted || false,
-      isOngoing: trip.tripStatus === "ongoing",
-      isUpcoming: trip.tripStatus === "upcoming",
-      isPast: trip.tripStatus === "past",
-      itinerary,
-      timelineView: Object.entries(itinerary).map(([dayNumber, posts]) => ({
-        dayNumber: Number(dayNumber),
-        posts,
-      })),
-    };
+    }
+    if(!currentUserFlags.canAccessPrivateData){
+       delete rawTrip.notes;
+       delete rawTrip.todoList;
+       delete rawTrip.expenses;
 
-    // Add private data for owner or collaborators
-    if (currentUserFlags.canAccessPrivateData) {
+    }else {
       const notes = [...trip.notes].sort((a, b) => {
         if (a.isPinned === b.isPinned) return new Date(b.createdAt) - new Date(a.createdAt);
         return a.isPinned ? -1 : 1;
@@ -129,13 +108,30 @@ const getTripById = async (req, res) => {
       const totalTasks = todos.length;
       const completedTasks = todos.filter((t) => t.done).length;
 
-      tripData.travelBudget = trip.travelBudget || 0;
-      tripData.totalSpent = totalSpent;
-      tripData.notes = notes;
-      tripData.todos = todos;
-      tripData.expenses = expenses;
-      tripData.taskStats = { totalTasks, completedTasks };
+      rawTrip.travelBudget = trip.travelBudget || 0;
+      rawTrip.totalSpent = totalSpent;
+      rawTrip.notes = notes;
+      rawTrip.todoList = todos;
+      rawTrip.expenses = expenses;
+      rawTrip.taskStats = { totalTasks, completedTasks };
     }
+    const tripData = {
+      ...rawTrip,
+      virtuals: {
+        tripStatus: trip.tripStatus,
+        duration: trip.duration,
+        durationText: trip.durationText,
+        postCount: trip.postCount,
+        isCollaborative: trip.isCollaborative,
+      },
+      currentUser: currentUserFlags,
+      totalLikes: trip.likes?.length || 0,
+      totalComments: trip.totalComments || 0,
+      tags: trip.tags || [],
+      isArchived: trip.isArchived,
+      itinerary,
+    };
+
 
     // Liked by followings
     const userDoc = await User.findById(user._id).select("following").populate("following", "name username avatar").lean();
@@ -143,8 +139,6 @@ const getTripById = async (req, res) => {
     const likedByFollowings = userDoc.following.filter((f) => likesOfTrip.includes(f._id.toString()));
 
     tripData.likedByFollowings = likedByFollowings;
-    tripData.likedByFollowingsPreview = likedByFollowings.slice(0, 5);
-    tripData.totalLikedByFollowings = likedByFollowings.length;
 
     // Pending invites if owner
     if (isOwner) {
@@ -159,8 +153,6 @@ const getTripById = async (req, res) => {
       totalLikes: trip.likes?.length || 0,
       totalComments: trip.totalComments || 0,
       totalPosts: trip.posts.length,
-      totalTasks: tripData.taskStats?.totalTasks || 0,
-      completedTasks: tripData.taskStats?.completedTasks || 0,
       collaboratorCount: trip.acceptedFriends?.length || 0,
     };
 

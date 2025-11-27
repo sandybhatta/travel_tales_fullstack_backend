@@ -33,7 +33,7 @@ export const sendEmail = async ({ toEmail, subject, templatePath, templateData }
 
    
 
-    // 3️⃣ Send POST request to Brevo API
+    // 3️ Send POST request to Brevo API
     const response = await axios.post(
       "https://api.brevo.com/v3/smtp/email",
       emailPayload,
