@@ -22,7 +22,7 @@ try {
     if(!trip){
         return res.status(404).json({message:"No trip was found"});
     }
-    const isOwner = trip.isOwnedBy(user._id);
+    const isOwner = trip.user._id.toString() === user._id.toString();
     const isCollaborator = trip.isFriendAccepted(user._id);
     if(isOwner || isCollaborator){
        return res.status(200).json({
