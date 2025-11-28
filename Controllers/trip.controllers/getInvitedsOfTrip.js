@@ -34,7 +34,7 @@ try {
             isOwner,
           });
     }else{
-        return res.status(403).json({message:"Only the owner and collaborators can see the invited list of this trip"})
+        return res.status(403).json({message:"Only the owner and collaborators can see the invited list of this trip", isOwner, isCollaborator})
     }
  
     
