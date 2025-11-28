@@ -219,13 +219,7 @@ tripSchema.virtual("duration").get(function () {
   
     return durationDays;
   });
-  // to get the duration days in human readable text
-tripSchema.virtual("durationText").get(function () {
-    const duration = this.duration;
-    if (duration === 0) return "0 days";
-    if (duration === 1) return "1 day";
-    return `${duration} days`;
-  });
+
   
 
 // what is the trip status

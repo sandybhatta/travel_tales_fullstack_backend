@@ -24,18 +24,20 @@ try {
     }
     const isOwner = trip.isOwnedBy(user._id);
     const isCollaborator = trip.isFriendAccepted(user._id);
-    if(!isOwner && !isCollaborator){
+    if(isOwner || isCollaborator){
+       return res.status(200).json({
+            success: true,
+            owner:trip.user,
+            title:trip.title,
+            invitedFriends: trip.invitedFriends,
+            invitedFriendsCount: trip.invitedFriends?.length || 0,
+            isOwner,
+          });
+    }else{
         return res.status(403).json({message:"Only the owner and collaborators can see the invited list of this trip"})
     }
-
-    res.status(200).json({
-        success: true,
-        owner:trip.user,
-        title:trip.title,
-        invitedFriends: trip.invitedFriends,
-        invitedFriendsCount: trip.invitedFriends?.length || 0,
-        isOwner,
-      });
+ 
+    
     } catch (error) {
         return res.status(500).json({
             message: "Internal Server Error",

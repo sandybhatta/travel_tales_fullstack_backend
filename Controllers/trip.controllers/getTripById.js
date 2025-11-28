@@ -120,7 +120,6 @@ const getTripById = async (req, res) => {
       virtuals: {
         tripStatus: trip.tripStatus,
         duration: trip.duration,
-        durationText: trip.durationText,
         postCount: trip.postCount,
         isCollaborative: trip.isCollaborative,
       },
