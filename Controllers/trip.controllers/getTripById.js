@@ -35,9 +35,9 @@ const getTripById = async (req, res) => {
       { path: "acceptedFriends.user", select: "name username avatar" },
       { path: "posts.addedBy", select: "name username avatar" },
       { path: "expenses.spentBy", select: "name username avatar" },
-      { path: "notes.createdBy", select: "name username avatar" },
-      { path: "todoList.createdBy", select: "name username avatar" },
-      { path: "todoList.assignedTo", select: "name username avatar" },
+      { path: "notes.createdBy", select: "username" },
+      { path: "todoList.createdBy", select: "username" },
+      { path: "todoList.assignedTo", select: "username" },
       {
         path: "posts.post",
         populate: [
