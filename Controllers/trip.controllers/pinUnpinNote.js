@@ -11,7 +11,6 @@ const pinUnpinNote = async (req,res)=>{
         if(!trip){
             return res.status(404).json({message:"No trip found"})
         }
-        console.log(trip.notes);
         const isOwner = trip.isOwnedBy(user._id);
         const isCollaborator = trip.isFriendAccepted(user._id);
 
