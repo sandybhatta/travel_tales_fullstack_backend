@@ -7,12 +7,14 @@ const pinUnpinNote = async (req,res)=>{
         const { tripId , noteId } = req.params;
         const user = req.user;
         
-        const trip = await Trip.findById(tripId).select("notes").populate("notes.createdBy" , "username")
+        const trip = await Trip.findById(tripId).select("notes  notes._id").populate("notes.createdBy" , "username")
         if(!trip){
             return res.status(404).json({message:"No trip found"})
         }
+        console.log(trip.notes);
         const isOwner = trip.isOwnedBy(user._id);
         const isCollaborator = trip.isFriendAccepted(user._id);
+
 
         if(!isOwner && !isCollaborator){
             return res.status(403).json({message:"Only owner or collaborator can pin and unpin a post"})
