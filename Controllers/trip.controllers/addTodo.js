@@ -30,7 +30,7 @@ const addTodo = async (req, res) => {
       if (!assignedUser) {
         return res.status(400).json({ message: "Assigned user does not exist." });
       }
-      if (!trip.isFriendAccepted(assignedTo)) {
+      if (!trip.isFriendAccepted(assignedTo) && !trip.isOwnedBy(assignedTo)) {
         return res.status(400).json({ message: "Assigned user must be an accepted collaborator." });
       }
     }
