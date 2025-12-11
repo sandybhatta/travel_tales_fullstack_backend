@@ -24,7 +24,6 @@ const deleteTodo = async(req,res)=>{
         await trip.save();
         return res.status(200).json({
             success:true,
-            todo:trip.todoList
         })
 
     } catch (error) {
