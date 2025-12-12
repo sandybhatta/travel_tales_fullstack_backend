@@ -23,6 +23,35 @@ const router = express.Router();
 //create a new post
 router.post("/",upload.array("post",20), protect, createPost)
 
+
+// posts that current user have made
+router.get("/me", protect , myPost)
+
+
+// get all post liked by the current user
+router.get("/liked-posts" , protect , postsLikedByUser)
+
+
+
+
+// posts that the user has been mentioned
+router.get("/mentioned-posts", protect , mentionedPost)
+
+
+
+
+// feed of posts of following
+router.get("/feed/following", protect , feedOfFollowing)
+
+
+
+
+// feed for exploring
+router.get("/feed/explore" , protect , exploreFeed)
+
+
+
+
 // get post details
 router.get("/:postId",protect, getPostDetails)
 
@@ -42,15 +71,11 @@ router.patch("/:postId/like", protect , toggleLikePost)
 router.get("/:postId/likes", protect, getLikesOfPost)
 
 
-// get all post liked by the current user
-router.get("/liked-posts" , protect , postsLikedByUser)
 
 
-// posts that the user has been mentioned
-router.get("/mentioned-posts", protect , mentionedPost)
 
-// posts that current user have made
-router.get("/me", protect , myPost)
+
+
 
 
 //all posts of a specific user
@@ -59,13 +84,5 @@ router.get("/user/:userId" , protect , postOfOthers)
 
 
 
-// feed of posts of following
-router.get("/feed/following", protect , feedOfFollowing)
-
-
-
-
-// feed for exploring
-router.get("/feed/explore" , protect , exploreFeed)
 
 export default router;
