@@ -33,7 +33,6 @@ const getTripById = async (req, res) => {
     await trip.populate([
       { path: "user", select: "name username avatar" },
       { path: "acceptedFriends.user", select: "name username avatar" },
-      { path: "posts.addedBy", select: "name username avatar" },
       { path: "expenses.spentBy", select: "name username avatar" },
       { path: "notes.createdBy", select: "username" },
       { path: "todoList.createdBy", select: "username" },
@@ -50,7 +49,7 @@ const getTripById = async (req, res) => {
 
     // Process posts
     const posts = await Promise.all(
-      trip.posts.map(async ({ post, addedBy, addedAt, captionOverride, dayNumber, isHighlighted, highlightedBy }) => {
+      trip.posts.map(async ({ post, addedAt, dayNumber, isHighlighted, highlightedBy }) => {
         const likeCount = post.likes?.length || 0;
         const commentCount = post.comments?.length || 0;
 
@@ -64,9 +63,7 @@ const getTripById = async (req, res) => {
 
         return {
           ...post.toObject(),
-          addedBy,
           addedAt,
-          captionOverride,
           dayNumber,
           isHighlighted,
           highlightedBy: highlightedByUser,

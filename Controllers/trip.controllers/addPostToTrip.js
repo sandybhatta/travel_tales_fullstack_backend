@@ -3,12 +3,13 @@ import Trip from "../../models/Trip.js";
 const addPostToTrip = async (req, res) => {
   try {
     const { tripId } = req.params;
-    const { postId, captionOverride, dayNumber, isHighlighted } = req.body;
+    // , , dayNumber, isHighlighted
+
+    const { posts  } = req.body;
     const userId = req.user._id;
 
-    if (!postId) {
-      return res.status(400).json({ error: "postId is required" });
-    }
+
+   
 
     const trip = await Trip.findById(tripId);
     if (!trip) {
@@ -19,22 +20,33 @@ const addPostToTrip = async (req, res) => {
       return res.status(403).json({ message: "Not allowed to add post to this trip" });
     }
 
-    const alreadyExists = trip.posts.some(p => p.post.toString() === postId);
+ 
+    
+    let tripPosts = []
 
-    if (alreadyExists) {
-      return res.status(400).json({ message: "Post already added to this trip" });
+    for( let post of posts ){
+      let alreadyExists = false;
+
+      if (!post._id) {
+        return res.status(400).json({ error: "postId is required" });
+      }
+      alreadyExists = trip.posts?.some(p => p.post.toString() === post._id.toString());
+      if(!alreadyExists){
+        
+        const postObj={
+          ...post,
+          highlightedBy:post.isHighlighted ? userId : null,
+        }
+        tripPosts.push(postObj)
+      }
     }
 
-    const postObj = {
-      post: postId,
-      addedBy: userId,
-      captionOverride: captionOverride?.trim(),
-      dayNumber: Number(dayNumber) || undefined,
-      isHighlighted: !!isHighlighted,
-      highlightedBy: isHighlighted ? userId : undefined,
-    };
 
-    trip.posts.push(postObj);
+     
+
+    
+ 
+    trip.posts = [...trip.posts, ...tripPosts]
 
     await trip.save();
 

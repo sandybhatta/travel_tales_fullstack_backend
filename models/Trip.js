@@ -147,19 +147,9 @@ const tripSchema = new mongoose.Schema({
           ref: "Post",
           required: true,
         },
-        addedBy: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
         addedAt: {
           type: Date,
           default: Date.now,
-        },
-        captionOverride: {
-          type: String,
-          trim: true,
-          maxlength: 1000,
         },
         dayNumber: {
           type: Number, // e.g., Day 1, Day 2 of the trip
@@ -172,7 +162,7 @@ const tripSchema = new mongoose.Schema({
         },
         highlightedBy: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "User", // usually trip owner
+          ref: "User", 
           default: null,
         },
     }
