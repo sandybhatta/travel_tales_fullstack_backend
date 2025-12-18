@@ -57,7 +57,24 @@ export const verifyOtpLogin = async (req, res) => {
     });
 
     //  9. Send access token + user info
-    const user = await User.findById(userId)
+    const user = await User.findById(userId).populate([
+      {
+        path:"followers",
+        select:"name username avatar"
+      },
+      {
+        path:"following",
+        select:"name username avatar"
+      },
+      {
+        path:"closeFriends",
+        select:"name username avatar"
+      },
+      {
+        path:"blockedUsers",
+        select:"name username avatar"
+      },
+    ])
 
     res.status(200).json({
       message: "OTP verified. Login complete.",
