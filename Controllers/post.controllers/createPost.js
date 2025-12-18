@@ -6,7 +6,7 @@ import User from "../../models/User.js"
 const createPost = async (req, res) => {
   try {
     const user = req.user;
-    const { caption, taggedUsers = [], tripId, location, visibility } = req.body;
+    const { caption, taggedUsers = [], tripId, location, visibility,mentions } = req.body;
 
     if (!caption && (!req.files || req.files.length === 0)) {
       return res.status(400).json({ message: "Post must have either caption or media." });
@@ -46,19 +46,7 @@ const createPost = async (req, res) => {
         .map(tag => tag.slice(1).trim().toLowerCase())
         .filter(tag => tag.length > 0);
 
-      // extract names
-        const mentionedUserNames= caption
-        .split(" ")
-        .filter(s=>s.startsWith('@'))
-        .map(s=>s.slice(1).trim())
-
-
-        if(mentionedUserNames.length>0){
-          let mentionedUsers = await User.find({
-            username:{$in:mentionedUserNames}
-          }).select("_id")
-          mentionedUsersId=mentionedUsers.map(user=>user._id)
-        }
+      
     }
 
 
@@ -85,7 +73,7 @@ const allowedVisibility = ["public", "followers", "close_friends","private"]
       trip: tripId || null,
       taggedUsers: validTaggedUsers,
       location:location?location:undefined,
-      mentions:mentionedUsersId?.length>0?mentionedUsersId : undefined
+      mentions:mentions?.length>0?mentions : undefined
     });
 
     res.status(201).json({ message: "Post created", post: newPost });
