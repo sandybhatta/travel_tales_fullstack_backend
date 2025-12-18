@@ -23,7 +23,7 @@ const createTrip = async (req, res) => {
       "expenses",
       "notes",
       "todoList",
-      "invitedFriends"
+      "invitedFriends","tags"
     ];
 
     fieldsToParse.forEach((field) => {

@@ -38,7 +38,7 @@ const deletePostOfTrip = async (req, res) => {
     await trip.save();
 
     // Delete post from Post collection
-    await Post.findByIdAndDelete(postId);
+    await Post.findByIdAndUpdate(postId,{tripId:null});
 
     return res.status(200).json({ message: "Post removed successfully from the trip." });
 

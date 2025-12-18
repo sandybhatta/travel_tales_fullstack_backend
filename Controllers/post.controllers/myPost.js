@@ -16,13 +16,16 @@ const myPost = async (req,res)=>{
                 select:"name username avatar"
             },
             {
+                path:"mentions",
+                select:"username"
+            },
+            {
                 path:"likes",
                 select:"_id",
             },
             {
                 path:"comments",
-                options:{limit:2},
-                populate:{path:"author" , select:"name username avatar"}
+                select:"_id"
             }
         ])
             .sort({createdAt:-1})

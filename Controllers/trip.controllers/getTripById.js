@@ -43,8 +43,14 @@ const getTripById = async (req, res) => {
           { path: "author", select: "name username avatar" },
           { path: "likes", select: "_id" },
           { path: "comments", select: "_id" },
+          { path: "mentions", select: "name username avatar" },
+          { path: "taggedUsers", select: "name username avatar" },
         ],
       },
+      {
+        path:"posts.highlightedBy",
+        select:"username avatar "
+      }
     ]);
 
     // Process posts

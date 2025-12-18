@@ -45,6 +45,7 @@ import getTodo from "../Controllers/trip.controllers/getTodo.js";
 import toggleTodo from "../Controllers/trip.controllers/toggleTodo.js";
 import deleteTodo from "../Controllers/trip.controllers/deleteTodo.js";
 
+
 //import getPostsOfTrip from "../Controllers/trip.controllers/getPostsOfTrip.js";
 
 
@@ -124,6 +125,8 @@ router.patch("/:tripId/complete", protect, completeTrip);
 
 //  LAST: Dynamic route for fetching trip by ID
 router.get("/:tripId", protect, getTripById);
+
+
 
 
 export default router;
