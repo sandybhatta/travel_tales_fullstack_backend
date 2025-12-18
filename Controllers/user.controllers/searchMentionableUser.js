@@ -2,46 +2,47 @@ import User from "../../models/User.js";
 
 const searchMentionableUser = async (req, res) => {
   try {
-    const user = req.user; // from protect middleware
     const { q } = req.query;
+    const currentUserId = req.user._id;
 
     if (!q || q.trim().length < 1) {
       return res.status(400).json({ message: "Query is required" });
     }
 
-    const regex = new RegExp("^" + q, "i"); // case-insensitive match from beginning
+    const regex = new RegExp("^" + q, "i");
 
-    // First search from users they follow
-    const currentUser = await User.findById(user._id).select("following");
+   
+    const currentUser = await User.findById(currentUserId).select("following");
 
+  
     const followingMatches = await User.find({
       _id: { $in: currentUser.following },
       username: { $regex: regex },
     })
       .select("username name avatar")
-      .limit(15);
+      .limit(5);
 
-    // If following matches are enough, return them
     if (followingMatches.length >= 5) {
       return res.json({ users: followingMatches });
     }
 
-    // Fetch more globally (excluding already matched users + current user)
-    const followingIds = followingMatches.map((u) => u._id);
-    followingIds.push(user._id); // exclude self
+    const excludeIds = [
+      currentUserId,
+      ...followingMatches.map((u) => u._id),
+    ];
 
     const globalMatches = await User.find({
-      _id: { $nin: followingIds },
+      _id: { $nin: excludeIds },
       username: { $regex: regex },
     })
       .select("username name avatar")
-      .limit(15 - followingMatches.length);
+      .limit(5 - followingMatches.length);
 
-    const allMatches = [...followingMatches, ...globalMatches];
-
-    return res.json({ users: allMatches });
+    return res.json({
+      users: [...followingMatches, ...globalMatches],
+    });
   } catch (error) {
-    console.error("Mention search error:", error.message);
+    console.error("Mention search error:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
