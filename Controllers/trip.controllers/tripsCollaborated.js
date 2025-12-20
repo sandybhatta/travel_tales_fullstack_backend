@@ -17,7 +17,7 @@ const tripsOfUser = async (req, res) => {
     }
 
     const allTrips = await Trip.find(
-        { acceptedFriends: userId }
+        { "acceptedFriends.user": userId }
     ).populate("user","name username avatar");
 
     if (allTrips.length === 0) {
