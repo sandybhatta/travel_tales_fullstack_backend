@@ -69,7 +69,7 @@ const allowedVisibility = ["public", "followers", "close_friends","private"]
       hashtags,
       media,
       visibility:postVisibility?postVisibility : allowedVisibility.includes(visibility)? visibility:undefined,
-      trip: tripId || null,
+      tripId: tripId || null,
       taggedUsers: validTaggedUsers,
       location:location?location:undefined,
       mentions:mentions?.length>0?mentions : undefined
