@@ -1,12 +1,12 @@
 import Post from "../../models/Post.js";
 import { uploadToCloudinary } from "../../utils/cloudinary.js";
 import Trip from "../../models/Trip.js"
-import User from "../../models/User.js"
+
 
 const createPost = async (req, res) => {
   try {
     const user = req.user;
-    const { caption, taggedUsers = [], tripId, location, visibility,mentions } = req.body;
+    const { caption, taggedUsers = [], tripId, location, visibility,mentions=[] } = req.body;
 
     if (!caption && (!req.files || req.files.length === 0)) {
       return res.status(400).json({ message: "Post must have either caption or media." });
@@ -37,7 +37,6 @@ const createPost = async (req, res) => {
 
     // Extract hashtags & mentions from caption
     let hashtags = [];
-    let mentionedUsersId=[];
 
     if (caption) {
       hashtags = caption
