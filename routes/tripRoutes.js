@@ -126,7 +126,7 @@ router.patch("/:tripId/complete", protect, completeTrip);
 //  LAST: Dynamic route for fetching trip by ID
 router.get("/:tripId", protect, getTripById);
 
-router.post("/reroute-posts",protect, fixTripPostLinks)
+
 
 
 export default router;
