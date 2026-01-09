@@ -205,7 +205,7 @@ tripSchema.virtual("duration").get(function () {
     const end = new Date(this.endDate);
   
     const durationMs = end - start; // Difference in milliseconds
-    const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24)); // Convert to days
+    const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24)) +1; // Convert to days
   
     return durationDays;
   });
