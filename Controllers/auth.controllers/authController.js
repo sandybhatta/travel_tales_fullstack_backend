@@ -235,7 +235,7 @@ export const logoutuser = async (req, res) => {
     // Clear the refresh token cookie
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
     });
 
@@ -423,7 +423,7 @@ export const deactivateUser =async(req,res)=>{
   
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
     });
     

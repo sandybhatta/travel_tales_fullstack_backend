@@ -39,9 +39,17 @@ const changeUsername = async (req, res) => {
 
     await user.save();
 
+    // Calculate new eligibility (will be false immediately after change)
+    const daysRemaining = 30; // Just changed, so full 30 days remaining
+
     return res.status(200).json({
       message: "Username changed successfully",
-      newUsername: user.username
+      newUsername: user.username,
+      usernameChangeStatus: {
+        canChange: false,
+        daysRemaining: daysRemaining,
+        lastChangedAt: user.usernameChangedAt
+      }
     });
 
   } catch (err) {

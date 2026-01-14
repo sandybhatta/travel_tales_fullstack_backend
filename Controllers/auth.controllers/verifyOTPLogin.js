@@ -37,7 +37,7 @@ export const verifyOtpLogin = async (req, res) => {
     }
 
     //  5. All good – generate tokens
-    const refreshToken = await getRefreshToken(userId); // You store it in DB inside that function
+    const refreshToken = await getRefreshToken(userId); 
     const accessToken = getAccessToken(userId);
 
     //  6. Clean up used OTP

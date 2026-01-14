@@ -40,10 +40,8 @@ const userSchema = new mongoose.Schema(
       select: false, 
     },
     avatar: {
-      type: String,
       public_id: { type: String, trim: true },
-      url: { type: String, trim: true },
-      default: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+      url: { type: String, trim: true, default: "https://cdn-icons-png.flaticon.com/512/149/149071.png" },
     },
     bio: {
       type: String,

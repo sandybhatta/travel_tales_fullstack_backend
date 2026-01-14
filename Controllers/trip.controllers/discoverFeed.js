@@ -6,15 +6,15 @@ const discoverFeed = async (req, res) => {
   try {
     const user = req.user;
     const limit = parseInt(req.query.limit) || 20;
-    const cursor = req.query.cursor || null;
-    const cursorFilter = cursor ? { createdAt: { $lt: new Date(cursor) } } : {};
+    const page = parseInt(req.query.page) || 1;
+    const skip = (page-1)*limit;
 
     // Fetch user context
     const currentUser = await User.findById(user._id)
       .select("following closeFriends interests bookmarks blockedUsers")
       .lean();
 
-    const followingIds = currentUser.following.map((id) => id.toString());
+    const followingIds = currentUser.following.map((f) => f.toString());
     const closeFriendIds = currentUser.closeFriends.map((id) => id.toString());
     const interestTags = currentUser.interests || [];
     const blockedUserIds = currentUser.blockedUsers.map((id) => id.toString());
@@ -42,7 +42,6 @@ const discoverFeed = async (req, res) => {
         {
           author: { $nin: blockedUserIds },
         },
-        cursorFilter,
       ],
     };
 
@@ -66,8 +65,10 @@ const discoverFeed = async (req, res) => {
           path: "sharedFrom",
           populate: { path: "author", select: "username avatar" },
         },
+        { path: "likes", select: "name username avatar _id" },
       ])
       .sort({ createdAt: -1 })
+      .skip(skip)
       .limit(limit * 3)
       .lean();
 
@@ -83,10 +84,11 @@ const discoverFeed = async (req, res) => {
         { user: { $in: followingIds } },
         { user: { $in: closeFriendIds } },
       ],
-      ...cursorFilter,
     })
       .populate("user", "username avatar name")
+      .populate("likes", "name username avatar _id")
       .sort({ createdAt: -1 })
+      .skip(skip)
       .limit(limit * 3)
       .lean();
 
@@ -113,6 +115,35 @@ const discoverFeed = async (req, res) => {
       return score;
     };
 
+    const followingIdSet = new Set(followingIds);
+    
+    // Helper function to get followings who liked the item
+    const getFollowingsWhoLiked = (item) => {
+      if (!item.likes || item.likes.length === 0) return [];
+      
+      // If likes are populated (objects), filter by _id
+      // If likes are just IDs, filter directly
+      const likedByFollowings = item.likes.filter((like) => {
+        const likeId = like._id ? like._id.toString() : like.toString();
+        return followingIdSet.has(likeId);
+      });
+      
+      // Return user info if populated
+      return likedByFollowings.map((like) => {
+        if (like._id) {
+          // Already populated
+          return {
+            _id: like._id,
+            name: like.name || "",
+            username: like.username || "",
+            avatar: like.avatar || null,
+          };
+        } else {
+          // Just ID - this shouldn't happen if populate worked, but handle it
+          return { _id: like };
+        }
+      });
+    };
     // Wrap content with score
     const wrappedPosts = posts.map((post) => ({
       type: "post",
@@ -132,77 +163,47 @@ const discoverFeed = async (req, res) => {
         new Date(b.data.createdAt) - new Date(a.data.createdAt)
     );
 
-    const seenAuthors = new Set();
-    const filteredFeed = [];
-    for (const item of fullFeed) {
-      const authorId = (
-        item.type === "post" ? item.data.author._id : item.data.user._id
-      ).toString();
-      if (seenAuthors.has(authorId)) continue;
-      seenAuthors.add(authorId);
-      filteredFeed.push(item);
-      if (filteredFeed.length >= limit) break;
-    }
-
-    // Pre-fetch like-users for UX enrichment
-    const allLikedIds = new Set();
-    filteredFeed.forEach((item) => {
-      item.data.likes?.forEach((id) => allLikedIds.add(id.toString()));
-    });
-    const likedUsers = await User.find({ _id: { $in: [...allLikedIds] } })
-      .select("username")
-      .lean();
-    const likedUserMap = Object.fromEntries(
-      likedUsers.map((u) => [u._id.toString(), u.username])
-    );
-
     // Enrichment
-    for (let item of filteredFeed) {
+    for (let item of fullFeed) {
       const d = item.data;
 
+      // Check if current user liked this item
+      const isLikedByViewer = d.likes?.some((like) => {
+        const likeId = like._id ? like._id.toString() : like.toString();
+        return likeId === user._id.toString();
+      });
+      d.isLikedByViewer = isLikedByViewer;
+
+      // Get followings who liked this item
+      const followingsWhoLiked = getFollowingsWhoLiked(d);
+      d.likedByFollowings = followingsWhoLiked;
+
       if (item.type === "post") {
-        d.isLikedByViewer = d.likes?.some(
-          (id) => id.toString() === user._id.toString()
-        );
         d.isBookmarkedByViewer = bookmarks.includes(d._id.toString());
         d.likeCount = d.likes?.length || 0;
         d.commentCount = d.comments?.length || 0;
         d.fromTrip = d.tripId?.title || null;
-
-        const intersect = followingIds.filter((f) =>
-          d.likes?.map((id) => id.toString()).includes(f)
-        );
-        if (intersect.length && likedUserMap[intersect[0]]) {
-          d.likedByFriend = `${likedUserMap[intersect[0]]} liked this`;
-        }
       } else {
-        d.isLikedByViewer = d.likes?.some(
-          (id) => id.toString() === user._id.toString()
-        );
         d.likeCount = d.likes?.length || 0;
-
-        const intersect = followingIds.filter((f) =>
-          d.likes?.map((id) => id.toString()).includes(f)
-        );
-        if (intersect.length && likedUserMap[intersect[0]]) {
-          d.likedByFriend = `${likedUserMap[intersect[0]]} liked this trip`;
-        }
       }
     }
 
-    const nextCursor = filteredFeed.length
-      ? filteredFeed[filteredFeed.length - 1].data.createdAt
-      : null;
+    // Apply pagination to the sorted feed
+    const filteredFeed = fullFeed.slice(skip, skip + limit);
+    const totalCount = fullFeed.length;
 
     res.status(200).json({
       feed: filteredFeed,
-      nextCursor,
-      hasMore: fullFeed.length > filteredFeed.length,
+      page,
+      totalPages: Math.ceil(totalCount / limit),
+      totalCount,
+      hasMore: skip + limit < totalCount,
     });
   } catch (err) {
+    console.error("Error in discoverFeed:", err);
     return res.status(500).json({
       message: "Internal Server Error",
-      error: error.message,
+      error: err.message,
     });
   }
 };

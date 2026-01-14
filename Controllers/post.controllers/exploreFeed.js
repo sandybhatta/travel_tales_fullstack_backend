@@ -93,12 +93,16 @@ const exploreFeed = async (req, res) => {
     // Optional: shuffle/mix/diversify
     feedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-   
-    
+    // Apply pagination
+    const paginatedFeed = feedItems.slice(skip, skip + limit);
+    const totalCount = feedItems.length;
 
     return res.status(200).json({
-      feed: limitedFeed,
-      hasMore: feedItems.length > (skip + limit)
+      feed: paginatedFeed,
+      page,
+      totalPages: Math.ceil(totalCount / limit),
+      totalCount,
+      hasMore: skip + limit < totalCount
     });
 
   } catch (error) {

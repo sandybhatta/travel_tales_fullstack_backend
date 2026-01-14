@@ -12,18 +12,27 @@ const getTripById = async (req, res) => {
     if (!trip) return res.status(404).json({ message: "Trip not found" });
 
     const canView = await trip.canView(user);
-    if (!canView) return res.status(403).json({ message: "You are not allowed to view this trip" });
+    if (!canView)
+      return res
+        .status(403)
+        .json({ message: "You are not allowed to view this trip" });
 
     const isOwner = trip.isOwnedBy(user._id);
     const isCollaborator = trip.isFriendAccepted(user._id);
-    const isLiked = trip.likes?.some((id) => id.toString() === user._id.toString());
+    const isLiked = trip.likes?.some(
+      (id) => id.toString() === user._id.toString()
+    );
 
     const currentUserFlags = {
-      userStatus: isOwner ? "owner" : isCollaborator ? "collaborator" : "viewer",
+      userStatus: isOwner
+        ? "owner"
+        : isCollaborator
+        ? "collaborator"
+        : "viewer",
       isInvited: trip.isFriendInvited(user._id),
       isLiked,
       canAddPost: trip.canPost(user),
-      canEditTrip: isOwner || isCollaborator ,
+      canEditTrip: isOwner || isCollaborator,
       canDeleteTrip: isOwner,
       canInviteFriends: isOwner,
       canAccessPrivateData: isOwner || isCollaborator,
@@ -41,44 +50,44 @@ const getTripById = async (req, res) => {
         path: "posts.post",
         populate: [
           { path: "author", select: "name username avatar" },
-          { path: "likes", select: "_id" },
-          { path: "comments", select: "_id" },
           { path: "mentions", select: "name username avatar" },
           { path: "taggedUsers", select: "name username avatar" },
         ],
       },
       {
-        path:"posts.highlightedBy",
-        select:"username avatar "
-      }
+        path: "posts.highlightedBy",
+        select: "username avatar ",
+      },
     ]);
 
     // Process posts
     const posts = await Promise.all(
-      trip.posts.map(async ({ post, addedAt, dayNumber, isHighlighted, highlightedBy }) => {
-        const likeCount = post.likes?.length || 0;
-        const commentCount = post.comments?.length || 0;
+      trip.posts.map(
+        async ({ post, addedAt, dayNumber, isHighlighted, highlightedBy }) => {
+          const likeCount = post.likes?.length || 0;
+          const commentCount = post.comments?.length || 0;
 
-        const isLikedByCurrentUser = post.likes.some((id) => id.toString() === user._id.toString());
-        const isPostedByOwner = trip.user._id.toString() === post.author._id.toString();
+          const isLikedByCurrentUser = post.likes.some(
+            (id) => id.toString() === user._id.toString()
+          );
+          const isPostedByOwner =
+            trip.user._id.toString() === post.author._id.toString();
 
-        let highlightedByUser = null;
-        if (isHighlighted && highlightedBy) {
-          highlightedByUser = await User.findById(highlightedBy).select("name username avatar");
+          let highlightedByUser = isHighlighted && highlightedBy ? highlightedBy : null;
+
+          return {
+            ...post.toObject(),
+            addedAt,
+            dayNumber,
+            isHighlighted,
+            highlightedBy: highlightedByUser,
+            likeCount,
+            commentCount,
+            isLikedByCurrentUser,
+            isPostedByOwner,
+          };
         }
-
-        return {
-          ...post.toObject(),
-          addedAt,
-          dayNumber,
-          isHighlighted,
-          highlightedBy: highlightedByUser,
-          likeCount,
-          commentCount,
-          isLikedByCurrentUser,
-          isPostedByOwner,
-        };
-      })
+      )
     );
 
     // Group by itinerary days
@@ -92,20 +101,26 @@ const getTripById = async (req, res) => {
     // Prepare main trip data object
     const rawTrip = {
       ...trip.toObject(),
-    }
-    if(!currentUserFlags.canAccessPrivateData){
-       delete rawTrip.notes;
-       delete rawTrip.todoList;
-       delete rawTrip.expenses;
-
-    }else {
+    };
+    if (!currentUserFlags.canAccessPrivateData) {
+      delete rawTrip.notes;
+      delete rawTrip.todoList;
+      delete rawTrip.expenses;
+    } else {
       const notes = [...trip.notes].sort((a, b) => {
-        if (a.isPinned === b.isPinned) return new Date(b.createdAt) - new Date(a.createdAt);
+        if (a.isPinned === b.isPinned)
+          return new Date(b.createdAt) - new Date(a.createdAt);
         return a.isPinned ? -1 : 1;
       });
 
-      const todos = [...trip.todoList].sort((a, b) => new Date((a.dueDate || a.createdAt)) - new Date((b.dueDate || b.createdAt)));
-      const expenses = [...trip.expenses].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const todos = [...trip.todoList].sort(
+        (a, b) =>
+          new Date(a.dueDate || a.createdAt) -
+          new Date(b.dueDate || b.createdAt)
+      );
+      const expenses = [...trip.expenses].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
 
       const totalSpent = expenses.reduce((acc, curr) => acc + curr.amount, 0);
       const totalTasks = todos.length;
@@ -128,17 +143,20 @@ const getTripById = async (req, res) => {
       },
       currentUser: currentUserFlags,
       totalLikes: trip.likes?.length || 0,
-      totalComments: trip.totalComments || 0,
       tags: trip.tags || [],
       isArchived: trip.isArchived,
       itinerary,
     };
 
-
     // Liked by followings
-    const userDoc = await User.findById(user._id).select("following").populate("following", "name username avatar").lean();
+    const userDoc = await User.findById(user._id)
+      .select("following")
+      .populate("following", "name username avatar")
+      .lean();
     const likesOfTrip = trip.likes?.map((id) => id.toString()) || [];
-    const likedByFollowings = userDoc.following.filter((f) => likesOfTrip.includes(f._id.toString()));
+    const likedByFollowings = userDoc.following.filter((f) =>
+      likesOfTrip.includes(f._id.toString())
+    );
 
     tripData.likedByFollowings = likedByFollowings;
 
@@ -153,13 +171,11 @@ const getTripById = async (req, res) => {
     // Engagement summary
     tripData.engagement = {
       totalLikes: trip.likes?.length || 0,
-      totalComments: trip.totalComments || 0,
       totalPosts: trip.posts.length,
       collaboratorCount: trip.acceptedFriends?.length || 0,
     };
 
     res.status(200).json({ trip: tripData });
-
   } catch (error) {
     return res.status(500).json({
       message: "Internal Server Error",

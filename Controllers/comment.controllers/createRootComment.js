@@ -18,9 +18,34 @@ const createRootComment = async (req, res) => {
     }
 
     
-    const post = await Post.findById(postId).select("_id");
+    const post = await Post.findById(postId).populate("author", "privacy followers closeFriends");
     if (!post) {
       return res.status(404).json({ message: "No post found" });
+    }
+
+    // Privacy Check
+    const author = post.author;
+    if (author) {
+        const allowComments = author.privacy?.allowComments || "everyone";
+        const isSelf = author._id.toString() === user._id.toString();
+
+        if (!isSelf) {
+             if (allowComments === "no_one") {
+                 return res.status(403).json({ message: "Comments are disabled for this post." });
+             }
+             if (allowComments === "followers") {
+                 const isFollower = author.followers.some(id => id.toString() === user._id.toString());
+                 if (!isFollower) {
+                      return res.status(403).json({ message: "Only followers can comment." });
+                 }
+             }
+             if (allowComments === "close_friends") {
+                 const isCloseFriend = author.closeFriends.some(id => id.toString() === user._id.toString());
+                 if (!isCloseFriend) {
+                      return res.status(403).json({ message: "Only close friends can comment." });
+                 }
+             }
+        }
     }
 
     

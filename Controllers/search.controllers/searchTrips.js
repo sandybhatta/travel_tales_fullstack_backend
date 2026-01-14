@@ -46,7 +46,7 @@ const searchTrips = async (req, res) => {
    
     const trips = await Trip.find(searchFilter)
       .select(
-        "title coverPhoto destinations tags totalLikes totalComments visibility user acceptedFriends createdAt"
+        "title coverPhoto destinations tags   visibility user acceptedFriends createdAt"
       )
       .populate("user", "name username avatar closeFriends blockedUsers")
       .populate("acceptedFriends.user", "name username avatar")

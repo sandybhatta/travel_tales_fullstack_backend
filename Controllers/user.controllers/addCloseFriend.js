@@ -15,6 +15,10 @@ try {
 
     const goingToBeCloseFriend= await User.findById(id).select("closeFriends blockedUsers isDeactivated isBanned username")
 
+    if(!goingToBeCloseFriend){
+        return res.status(404).send({message:"User not found"})
+    }
+
     if(goingToBeCloseFriend.isBanned){
         return res.status(403).send({message:"The account has been banned of that user"})
     }
@@ -31,7 +35,7 @@ try {
    }
 
 // am i following the user 
-   const isFollowing =  user.following?.some(id=>id.toString() === goingToBeCloseFriend._id)
+   const isFollowing =  user.following?.some(id=>id.toString() === goingToBeCloseFriend._id.toString())
    
    //if not then follow first
    if(!isFollowing){
@@ -39,7 +43,7 @@ try {
    }
 
    // if i already added as close friend
-   const alreadyCloseFriend = user.closeFriends?.some(id=>id.toString()=== goingToBeCloseFriend._id)
+   const alreadyCloseFriend = user.closeFriends?.some(id=>id.toString()=== goingToBeCloseFriend._id.toString())
 
    if (alreadyCloseFriend) {
     return res.status(400).send({message:`you and ${goingToBeCloseFriend.username} are already close friends`})

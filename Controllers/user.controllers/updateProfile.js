@@ -1,29 +1,20 @@
 import { uploadToCloudinary } from "../../utils/cloudinary.js";
+import cloudinary from "../../utils/cloudinary.js";
 
 
 
 
 const updateProfile= async(req,res)=>{
     const user=req.user
-    const {name , bio, avatar, city , state, country , interests}=req.body
+    const {name , bio,  city , state, country , interests}=req.body
 
     try{
-        // if other fields are updating through this api rather than the fields that are expected to modify only then throw error
-
         const allowedFields = ["name", "bio", "avatar", "city", "state", "country" , "interests"];
 
         const invalidFields = Object.keys(req.body).filter(key => !allowedFields.includes(key));
 
         if (invalidFields.length) {
             return res.status(400).json({ message: `Invalid field(s): ${invalidFields.join(", ")}` });
-        }
-
-
-
-        if(interests !== undefined){
-          if(!Array.isArray(interests)){
-            return res.status(400).send({message:"interests should be an array"})
-          }
         }
 
         const allowedInterests=[
@@ -49,13 +40,28 @@ const updateProfile= async(req,res)=>{
           "shopping",
         ]
 
+        let parsedInterests = interests
 
-        const isValid=interests.every(interest=>allowedInterests.includes(interest))
-        if(!isValid){
-          return res.status(400).send({message:"interest is not valid"})
+        if(parsedInterests !== undefined){
+          if(typeof parsedInterests === "string"){
+            try{
+              parsedInterests = JSON.parse(parsedInterests)
+            }catch{
+              return res.status(400).send({message:"interests should be an array"})
+            }
+          }
+
+          if(!Array.isArray(parsedInterests)){
+            return res.status(400).send({message:"interests should be an array"})
+          }
+
+          const isValid=parsedInterests.every(interest=>allowedInterests.includes(interest))
+          if(!isValid){
+            return res.status(400).send({message:"interest is not valid"})
+          }
+
+          user.interests=parsedInterests
         }
-
-        user.interests=interests
 
        if(name !== undefined){
         user.name=name
@@ -64,14 +70,22 @@ const updateProfile= async(req,res)=>{
         user.bio=bio
        }
        if (req.file && req.file.mimetype.startsWith("image/")) {
-        const result = await uploadToCloudinary(req.file, "/post/avatar", "image");
+        // Check if user has a previous avatar with a public_id (not the default one)
+        if (user.avatar && user.avatar.public_id) {
+            try {
+                await cloudinary.uploader.destroy(user.avatar.public_id);
+            } catch (destroyErr) {
+                console.error("Failed to delete old avatar:", destroyErr);
+                // Continue with upload even if delete fails
+            }
+        }
+
+        const result = await uploadToCloudinary(req.file.buffer, "/post/avatar", "image");
         user.avatar = {
           public_id: result.public_id,
           url: result.secure_url,
         };
       }
-
-       // if any of the location key exists then only change the location object if none of them are passed then no need to change it to the same location as it was
 
        if(city || state || country){
         user.location.city=city || user.location.city

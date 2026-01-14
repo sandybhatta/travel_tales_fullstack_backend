@@ -30,6 +30,16 @@ import rejectInvitation from "../Controllers/user.controllers/rejectInvitation.j
 import getUsersToFollow from "../Controllers/user.controllers/getUsersToFollow.js"
 import userProfile from "../Controllers/user.controllers/userProfile.js"
 
+import { updatePrivacy } from "../Controllers/settings.controllers/updatePrivacy.js";
+import { updateAccountStatus } from "../Controllers/settings.controllers/accountSettings.js";
+import blockUser from "../Controllers/settings.controllers/blockUser.js";
+import unblockUser from "../Controllers/settings.controllers/unblockUser.js";
+import getBlockedUsers from "../Controllers/settings.controllers/getBlockedUsers.js";
+
+import getLikedPosts from "../Controllers/activity.controllers/getLikedPosts.js";
+import getCommentedPosts from "../Controllers/activity.controllers/getCommentedPosts.js";
+import getLikedTrips from "../Controllers/activity.controllers/getLikedTrips.js";
+
 
 
 
@@ -144,10 +154,17 @@ router.get("/users" , protect , getUsersToFollow)
 // to get profile details
 router.get("/:id/profile" , protect , userProfile)
 
+// --- Settings Routes ---
+router.put("/settings/privacy", protect, updatePrivacy);
+router.put("/settings/account", protect, updateAccountStatus);
 
+router.get("/settings/blocked", protect, getBlockedUsers);
+router.post("/settings/block/:id", protect, blockUser);
+router.delete("/settings/unblock/:id", protect, unblockUser);
 
-
-
-
+// --- Activity Routes ---
+router.get("/activity/likes/posts", protect, getLikedPosts);
+router.get("/activity/comments/posts", protect, getCommentedPosts);
+router.get("/activity/likes/trips", protect, getLikedTrips);
 
 export default router

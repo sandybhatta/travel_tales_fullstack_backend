@@ -102,7 +102,7 @@ const  deleteUser = async (req, res) => {
     // 11. Clear cookie if set
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
     });
 

@@ -39,10 +39,6 @@ const tripSchema = new mongoose.Schema({
 
     isArchived: { type: Boolean, default: false },
 
-    totalLikes: { type: Number, default: 0 },
-    
-    totalComments: { type: Number, default: 0 },
-
 
 
     title: {

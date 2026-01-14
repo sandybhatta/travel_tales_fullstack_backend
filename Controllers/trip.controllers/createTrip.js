@@ -57,8 +57,6 @@ const createTrip = async (req, res) => {
       user: user._id,
       isArchived: false,
       isCompleted: false,
-      totalLikes: 0,
-      totalComments: 0,
     };
 
     // 2. Validate required fields

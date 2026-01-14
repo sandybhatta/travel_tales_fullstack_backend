@@ -17,9 +17,19 @@ const followingOfUser = async (req, res) => {
           options: { skip, limit },
         });
 
+      const followingList = self.following.map((f) => {
+        const fObj = f.toObject();
+        return {
+          ...fObj,
+          isCloseFriend: user.closeFriends?.some(
+            (cfId) => cfId.toString() === f._id.toString()
+          ),
+        };
+      });
+
       return res.status(200).json({
         count: self.following.length,
-        followingList: self.following,
+        followingList,
         hasMore: self.following.length > skip + limit,
       });
     }
