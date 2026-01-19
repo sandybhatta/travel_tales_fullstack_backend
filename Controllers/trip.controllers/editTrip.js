@@ -6,12 +6,24 @@ const editTrip = async(req,res)=>{
     const {tripId}=req.params;
     const user=req.user
 
-    const {title, description ,tags ,startDate ,endDate ,destinations ,visibility ,travelBudget ,isArchived ,isCompleted ,coverPhoto , ...others  } = req.body
+    let {title, description ,tags ,startDate ,endDate ,destinations ,visibility ,travelBudget ,isArchived ,isCompleted ,coverPhoto , ...others  } = req.body
     if (!tripId) {
         res.status(400).json({message:"no trip id was given"})
     }
 
     try {
+        // Handle FormData parsing (strings to objects/types)
+        if (typeof tags === 'string') {
+             try { tags = JSON.parse(tags); } catch (e) { tags = []; }
+        }
+        if (typeof destinations === 'string') {
+             try { destinations = JSON.parse(destinations); } catch (e) { destinations = []; }
+        }
+        if (isArchived === 'true') isArchived = true;
+        if (isArchived === 'false') isArchived = false;
+        if (isCompleted === 'true') isCompleted = true;
+        if (isCompleted === 'false') isCompleted = false;
+        
         if (others && Object.keys(others).length > 0) {
             return res.status(400).json({ message: "these edits can't be done here" });
           }
@@ -48,10 +60,28 @@ const editTrip = async(req,res)=>{
         
 
         //check for tags and save
-        const allowedTagsSet = new Set( [
-            "adventure", "beach", "mountain", "city", "honeymoon", "family",
-            "solo", "friends", "luxury", "budget", "wildlife", "roadtrip", "spiritual"
-          ])
+        const allowedTagsSet = new Set([
+            "adventure",
+            "beach",
+            "mountains",
+            "history",
+            "food",
+            "wildlife",
+            "culture",
+            "luxury",
+            "budget",
+            "road_trip",
+            "solo",
+            "group",
+            "trekking",
+            "spiritual",
+            "nature",
+            "photography",
+            "festivals",
+            "architecture",
+            "offbeat",
+            "shopping",
+        ])
 
         if(tags && tags.length > 0){
             for (let tag of tags) {
@@ -105,7 +135,7 @@ const editTrip = async(req,res)=>{
                 await cloudinary.uploader.destroy(trip.coverPhoto.public_id);
               }
               
-            const result = await uploadToCloudinary(req.file, "/trip/coverPhoto", "image");
+            const result = await uploadToCloudinary(req.file.buffer, "/trip/coverPhoto", "image");
             trip.coverPhoto = {
               public_id: result.public_id,
               url: result.secure_url,
@@ -114,7 +144,7 @@ const editTrip = async(req,res)=>{
         }
         await trip.save()
 
-        res.status(200).json({ message: "Trip updated successfully", tripId });
+        res.status(200).json({ message: "Trip updated successfully", tripId, trip });
 
        
 

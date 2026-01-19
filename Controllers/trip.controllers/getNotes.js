@@ -4,11 +4,11 @@ const getNotes = async(req,res)=>{
 try {
     const user = req.user
     const { tripId } = req.params;
-    const trip = await Trip.findById(tripId).select("notes").populate("notes.createdBy" , "name username avatar")
+    const trip = await Trip.findById(tripId).select("notes user acceptedFriends").populate("notes.createdBy" , "name username avatar")
     if (!trip) {
         res.status(404).json({message:"no trip found"})
     }
-    const isOwner = trip.isOwner(user._id);
+    const isOwner = trip.isOwnedBy(user._id);
     const isCollaborator = trip.isFriendAccepted(user._id)
     
     if (!isOwner && !isCollaborator) {

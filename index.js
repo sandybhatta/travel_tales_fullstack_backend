@@ -21,7 +21,7 @@ scheduleTripCompletion()
 
 connectDb();
 
-// 🚀 Create Express app
+// Create Express app
 const app = express();
 
 
@@ -77,6 +77,6 @@ app.use('/api/search',searchRoutes)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🔥 Server running on http://localhost:${PORT}`);
+  console.log(` Server running on http://localhost:${PORT}`);
  
 });

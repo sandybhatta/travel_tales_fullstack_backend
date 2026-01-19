@@ -43,12 +43,16 @@ const getRootComment = async (req, res) => {
     const commentsWithReplyCount = await Promise.all(
       rootComments.map(async (comment) => {
         const replyCount = await Comment.countDocuments({
-          parentComment: comment._id,
+          rootComment: comment._id,
         });
+        
+        const hasLiked = comment.likes.some(like => like._id.toString() === user._id.toString());
+
         return {
           ...comment,
           replyCount,
-          isOwner:comment.author._id.equals(user._id)
+          isOwner:comment.author._id.equals(user._id),
+          hasLiked
         };
       })
     );

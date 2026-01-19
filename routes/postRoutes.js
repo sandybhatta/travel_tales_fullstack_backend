@@ -13,6 +13,7 @@ import myPost from "../Controllers/post.controllers/myPost.js";
 import postOfOthers from "../Controllers/post.controllers/postOfOthers.js";
 import feedOfFollowing from "../Controllers/post.controllers/feedOfFollowing.js";
 import exploreFeed from "../Controllers/post.controllers/exploreFeed.js";
+import deletePost from "../Controllers/post.controllers/deletePost.js";
 const router = express.Router();
 
 
@@ -60,6 +61,10 @@ router.post("/:postId/share", protect , sharePost)
 
 // to edit a post
 router.patch("/:postId" , protect , editPost)
+
+// delete a post
+router.delete("/:postId", protect, deletePost)
+
 
 
 // toggle like a post

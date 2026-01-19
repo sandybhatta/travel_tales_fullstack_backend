@@ -11,7 +11,7 @@ const inviteToTrip = async (req, res) => {
       return res.status(400).json({ message: "Trip ID and invitee are required." });
     }
 
-    // 🔍 Fetch trip
+    //  Fetch trip
     const trip = await Trip.findById(tripId);
 
     if (!trip) {
@@ -40,7 +40,7 @@ const inviteToTrip = async (req, res) => {
       return res.status(200).json({ message: "User already a collaborator." });
     }
 
-    // ⚠️ Already invited
+    //  Already invited
     const isAlreadyInvited = trip.isFriendInvited(invitee);
     if (isAlreadyInvited) {
       return res.status(200).json({ message: "User already invited." });

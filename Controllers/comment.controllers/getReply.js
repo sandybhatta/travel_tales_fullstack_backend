@@ -32,10 +32,12 @@ const getReply = async (req, res) => {
     const repliesWithCounts = await Promise.all(
       replies.map(async (reply) => {
         const replyCount = await Comment.countDocuments({ parentComment: reply._id });
+        const hasLiked = reply.likes.some(like => like._id.toString() === user._id.toString());
         return {
           ...reply,
           replyCount,
-          isOwner:reply.author._id.equals(user._id)
+          isOwner:reply.author._id.equals(user._id),
+          hasLiked
         };
       })
     );

@@ -10,15 +10,33 @@ const getPostDetails = async (req, res) => {
     const post = await Post.findById(postId).populate([
       {
         path: "author",
-        select: "name username avatar followers closeFriends",
+        select: "name username avatar followers closeFriends privacy",
       },
       {
         path: "taggedUsers",
+        select: "name username avatar followers",
+      },
+      {
+        path: "mentions",
+        select: "name username avatar",
+      },
+      {
+        path: "likes",
         select: "name username avatar",
       },
       {
         path: "tripId",
-        select: "title visibility startDate endDate collaborators user",
+        select: "title visibility startDate endDate acceptedFriends user coverPhoto destinations",
+        populate: [
+          {
+            path: "user",
+            select: "name username avatar",
+          },
+          {
+            path: "acceptedFriends.user",
+            select: "name username avatar",
+          },
+        ],
       },
       {
         path: "sharedFrom",
@@ -32,8 +50,22 @@ const getPostDetails = async (req, res) => {
             select: "name username avatar",
           },
           {
+            path: "mentions",
+            select: "name username avatar",
+          },
+          {
             path: "tripId",
-            select: "title visibility startDate endDate",
+            select: "title visibility startDate endDate acceptedFriends user coverPhoto destinations",
+            populate: [
+              {
+                path: "user",
+                select: "name username avatar",
+              },
+              {
+                path: "acceptedFriends.user",
+                select: "name username avatar",
+              },
+            ],
           },
         ],
       },
@@ -41,6 +73,10 @@ const getPostDetails = async (req, res) => {
 
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
+    }
+
+    if (!post.author) {
+      return res.status(404).json({ message: "Post author not found" });
     }
 
     const isOwner = post.author._id.toString() === user._id.toString();
@@ -87,12 +123,17 @@ const getPostDetails = async (req, res) => {
   
     if (post.sharedFrom && !isOwner) {
       const original = post.sharedFrom;
+      let isOriginalPublic = false;
 
-      const isTripShared =
-        !original.tripId || original.tripId.visibility === "public";
-      const isPostShared = (original.visibility || "public") === "public";
+      if (original.tripId) {
+        // If part of a trip, Trip visibility dictates
+        isOriginalPublic = original.tripId.visibility === "public";
+      } else {
+        // Standalone post
+        isOriginalPublic = (original.visibility || "public") === "public";
+      }
 
-      if (!isTripShared || !isPostShared) {
+      if (!isOriginalPublic) {
         return res.status(403).json({
           message: "The original post has been restricted by the author.",
         });
@@ -100,13 +141,13 @@ const getPostDetails = async (req, res) => {
     }
 
     // Step 3: Engagement info
+    const likeIds = post.likes.map(like => like._id);
     const [
       commentsCount,
       hasLiked,
       bookmarkCount,
       isBookmarked,
       shareCount,
-      rootComments,
       followedLikes,
     ] = await Promise.all([
       Comment.countDocuments({ post: post._id }),
@@ -114,12 +155,11 @@ const getPostDetails = async (req, res) => {
       User.countDocuments({ bookmarks: post._id }),
       User.exists({ _id: user._id, bookmarks: post._id }),
       Post.countDocuments({ sharedFrom: post._id }),
-      Comment.find({ post: post._id, parentComment: null })
-        .sort({ createdAt: -1 })
-        .populate("author", "name username avatar")
-        .limit(10),
       User.find({
-        _id: { $in: post.likes, $in: user.following },
+        $and: [
+          { _id: { $in: likeIds } },
+          { _id: { $in: user.following } }
+        ]
       })
         .select("name username avatar")
         .limit(3),
@@ -128,13 +168,20 @@ const getPostDetails = async (req, res) => {
     const likesCount = post.likes?.length || 0;
 
     // Step 4: Shareability
+    // Logic: Trip overrides Post. If Trip exists, check Trip visibility. Else check Post.
+    const isPostPublic = post.tripId
+      ? post.tripId.visibility === "public"
+      : (post.visibility || "public") === "public";
+
+    let isOriginalPublic = true;
     const sharedFrom = post.sharedFrom;
-    const canShare =
-      (post.visibility || "public") === "public" &&
-      (!post.tripId || post.tripId.visibility === "public") &&
-      (!sharedFrom ||
-        ((sharedFrom.visibility || "public") === "public" &&
-          (!sharedFrom.tripId || sharedFrom.tripId.visibility === "public")));
+    if (sharedFrom) {
+      isOriginalPublic = sharedFrom.tripId
+        ? sharedFrom.tripId.visibility === "public"
+        : (sharedFrom.visibility || "public") === "public";
+    }
+
+    const canShare = isPostPublic && isOriginalPublic;
 
     res.status(200).json({
       message: "Post details fetched successfully",
@@ -147,7 +194,6 @@ const getPostDetails = async (req, res) => {
       bookmarkCount,
       isBookmarked: !!isBookmarked,
       shareCount,
-      rootComments,
       followedLikes,
     });
   } catch (error) {

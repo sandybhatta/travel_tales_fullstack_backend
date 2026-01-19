@@ -1,7 +1,7 @@
 import Post from "../../models/Post.js";
 import User from "../../models/User.js";
 
-// 🔁 Recursive function to trace the original post
+//  Recursive function to trace the original post
 const findOriginalPost = async (postId) => {
   const post = await Post.findById(postId).select("sharedFrom");
   if (!post) return null;
@@ -11,7 +11,7 @@ const findOriginalPost = async (postId) => {
 const sharePost = async (req, res) => {
   try {
     const { postId } = req.params;
-    const { caption, taggedUsers = [], location, visibility } = req.body;
+    const { caption, taggedUsers = [], location, mentions } = req.body;
     const user = req.user;
 
     //  Get the very original post (not just the shared one)
@@ -25,11 +25,20 @@ const sharePost = async (req, res) => {
       .select("tripId visibility")
       .populate("tripId", "visibility");
 
-    const isPublic =
-      original?.visibility === "public" ||
-      (original?.tripId && original.tripId.visibility === "public");
+    // Strict visibility check:
+    // 1. If part of a trip, ONLY trip visibility matters.
+    // 2. If NOT part of a trip, post visibility matters.
+    let isShareable = false;
 
-    if (!isPublic) {
+    if (original.tripId) {
+      // Post is part of a trip -> Trip visibility rules apply
+      isShareable = original.tripId.visibility === "public";
+    } else {
+      // Post is standalone -> Post visibility rules apply
+      isShareable = original.visibility === "public";
+    }
+
+    if (!isShareable) {
       return res.status(403).json({
         message: "Only public posts or posts from public trips can be shared",
       });
@@ -46,7 +55,7 @@ const sharePost = async (req, res) => {
 
     //  Hashtags and Mentions
     let hashtags = [];
-    let mentionedUsersId = [];
+   
 
     if (caption) {
       const words = caption.split(" ");
@@ -56,16 +65,7 @@ const sharePost = async (req, res) => {
         .map((tag) => tag.slice(1).trim().toLowerCase())
         .filter((tag) => tag.length > 0);
 
-      const mentionedUsernames = words
-        .filter((word) => word.startsWith("@"))
-        .map((s) => s.slice(1).trim());
-
-      if (mentionedUsernames.length > 0) {
-        const mentionedUsers = await User.find({
-          username: { $in: mentionedUsernames },
-        }).select("_id");
-        mentionedUsersId = mentionedUsers.map((u) => u._id);
-      }
+     
     }
 
     //  Create the shared post
@@ -73,13 +73,11 @@ const sharePost = async (req, res) => {
       author: user._id,
       caption: caption?.trim() || undefined,
       hashtags: hashtags.length > 0 ? hashtags : undefined,
-      mentions: mentionedUsersId.length > 0 ? mentionedUsersId : undefined,
+      mentions: mentions?.length > 0 ? mentions : undefined,
       taggedUsers: validTaggedUsers.length > 0 ? validTaggedUsers : [],
       sharedFrom: original._id,
       location: location || undefined,
-      visibility: ["public", "followers", "close_friends", "private"].includes(visibility)
-        ? visibility
-        : "public", // default fallback
+      visibility:  "public", // default fallback
     });
 
     return res.status(201).json({

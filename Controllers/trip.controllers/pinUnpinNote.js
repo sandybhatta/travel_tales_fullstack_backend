@@ -7,7 +7,7 @@ const pinUnpinNote = async (req,res)=>{
         const { tripId , noteId } = req.params;
         const user = req.user;
         
-        const trip = await Trip.findById(tripId).populate("notes.createdBy" , "username")
+        const trip = await Trip.findById(tripId).populate("notes.createdBy" , "username avatar")
         if(!trip){
             return res.status(404).json({message:"No trip found"})
         }

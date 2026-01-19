@@ -268,28 +268,34 @@ tripSchema.methods.toggleTodo = function (todoId) {
 
 
 
+// Helper to safely get string ID from populated or unpopulated field
+const getUserId = (field) => {
+  if (!field) return null;
+  return field._id ? field._id.toString() : field.toString();
+};
+
 // is the trip owned by the user
 tripSchema.methods.isOwnedBy = function (userId) {
     if (!userId) return false;
-    return this.user.toString() === userId.toString();
+    const ownerId = getUserId(this.user);
+    return ownerId === userId.toString();
   };
 
 
 // is the frined invited to the trip
 tripSchema.methods.isFriendInvited = function (userId) {
     return this.invitedFriends.some(
-      (friendId) => friendId.toString() === userId.toString()
+      (friendId) => getUserId(friendId) === userId.toString()
     );
   };
 // is the friend accepted the trip invitation
 tripSchema.methods.isFriendAccepted = function (userId) {
     return this.acceptedFriends?.some(
-      (friend) => friend.user.toString() === userId.toString()
+      (friend) => getUserId(friend.user) === userId.toString()
     );
   }; 
   
   
-
 
 // who can view 
 tripSchema.methods.canView = async function (user) {
@@ -298,25 +304,36 @@ tripSchema.methods.canView = async function (user) {
   
     // If no user is logged in
     if (!user) return false;
+
+    const userId = user._id.toString();
+    const ownerId = getUserId(this.user);
   
     // If user is the trip owner
-    if (this.user.toString() === user._id.toString() || this.acceptedFriends?.some(friendObj => friendObj.user.toString() === user._id.toString())
-    ) return true;
+    if (ownerId === userId) return true;
+    
+    // If user is a collaborator
+    const isCollaborator = this.acceptedFriends?.some(
+      (friend) => getUserId(friend.user) === userId
+    );
+    if (isCollaborator) return true;
   
-    // Populate the owner's followers and closeFriends only if needed
-    const TripOwner = await mongoose.model("User").findById(this.user)
+    // Fetch the owner's followers and closeFriends
+    // We fetch using ownerId to be safe regardless of population state
+    const TripOwner = await mongoose.model("User").findById(ownerId)
       .select("followers closeFriends")
       .lean();
-  
+
+    if (!TripOwner) return false;
+
     if (this.visibility === "followers") {
       return TripOwner.followers?.some(
-        (followerId) => followerId.toString() === user._id.toString()
+        (followerId) => followerId.toString() === userId
       );
     }
   
     if (this.visibility === "close_friends") {
       return TripOwner.closeFriends?.some(
-        (friendId) => friendId.toString() === user._id.toString()
+        (friendId) => friendId.toString() === userId
       );
     }
   
@@ -330,14 +347,14 @@ tripSchema.methods.canPost = function (user) {
     if (!user) return false;
   
     const userId = user._id.toString();
-    const ownerId = this.user.toString();
+    const ownerId = getUserId(this.user);
   
     // Check if the user is the trip owner
     if (userId === ownerId) return true;
   
     // Check if user is in accepted friends
     return this.acceptedFriends.some(
-      friendId => friendId.toString() === userId
+      friend => getUserId(friend.user) === userId
     );
   };
   

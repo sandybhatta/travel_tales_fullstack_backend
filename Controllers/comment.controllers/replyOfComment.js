@@ -60,7 +60,7 @@ const replyOfComment = async (req, res) => {
     }
 
     // Validate root comment
-    const rootComment = await Comment.findById(rootCommentId).select("_id");
+    const rootComment = await Comment.findById(rootCommentId).select("_id post");
     if (!rootComment || rootComment.post.toString() !== post._id.toString()) {
       return res.status(400).json({ message: "Invalid root comment for this post." });
     }

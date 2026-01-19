@@ -24,6 +24,9 @@ const addNote = async(req,res)=>{
             isPinned: !!isPinned
         })
         await trip.save();
+
+        await trip.populate("notes.createdBy", "username avatar");
+
         return res.status(200).json({
             success:true,
             message:"note have been added successfully in this trip",

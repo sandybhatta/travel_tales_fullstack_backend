@@ -6,7 +6,7 @@ const getExpensesTrip = async (req, res) => {
     const { tripId } = req.params;
 
     const trip = await Trip.findById(tripId)
-      .select("expenses")
+      .select("expenses user acceptedFriends")
       .populate("expenses.spentBy", "name username avatar");
 
     if (!trip) {

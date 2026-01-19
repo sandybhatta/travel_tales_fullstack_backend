@@ -20,6 +20,10 @@ router.post("/:postId", protect , createRootComment)
 router.post("/:postId/:rootCommentId/:parentCommentId/reply", protect , replyOfComment)
 
 
+// get list of users who liked the comment
+router.get("/:commentId/likes", protect, getListOfLikeOfComment )
+
+
 // get root level comments on a post
 router.get("/:postId", protect, getRootComment)
 
@@ -40,7 +44,4 @@ router.patch("/:commentId", protect, editComment)
 // like unlike a comment
 router.post("/:commentId/like", protect, likeUnlikeComment)
 
-
-// get list of users who liked the comment
-router.get("/:commentId/likes", protect, getListOfLikeOfComment )
 export default router

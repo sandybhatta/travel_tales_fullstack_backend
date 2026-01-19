@@ -6,7 +6,7 @@ const createRootComment = async (req, res) => {
   try {
     const  user  = req.user;
     const { postId } = req.params;
-    const { content } = req.body;
+    const { content, mentions: rawMentions } = req.body;
 
 
     if (!content || content.trim().length === 0) {
@@ -50,18 +50,10 @@ const createRootComment = async (req, res) => {
 
     
     let mentions = [];
-
-    const words = content.split(" ");
-    const potentialMentions = words
-      .filter((word) => word.startsWith("@"))
-      .map((word) => word.slice(1).trim());
-
-    if (potentialMentions.length > 0) {
-      const mentionedUsers = await User.find({
-        username: { $in: potentialMentions },
-      }).select("_id");
-
-      mentions = mentionedUsers.map((u) => u._id);
+    if (Array.isArray(rawMentions) && rawMentions.length > 0) {
+        // Validate that provided IDs are real users to prevent bad data
+        const validUsers = await User.find({ _id: { $in: rawMentions } }).select("_id");
+        mentions = validUsers.map(u => u._id);
     }
 
     const newComment = await Comment.create({

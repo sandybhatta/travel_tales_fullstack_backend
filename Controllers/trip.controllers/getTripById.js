@@ -1,3 +1,4 @@
+import Comment from "../../models/Comment.js";
 import Trip from "../../models/Trip.js";
 import User from "../../models/User.js";
 
@@ -34,7 +35,7 @@ const getTripById = async (req, res) => {
       canAddPost: trip.canPost(user),
       canEditTrip: isOwner || isCollaborator,
       canDeleteTrip: isOwner,
-      canInviteFriends: isOwner,
+      canInviteFriends: isOwner || isCollaborator,
       canAccessPrivateData: isOwner || isCollaborator,
     };
 
@@ -43,9 +44,9 @@ const getTripById = async (req, res) => {
       { path: "user", select: "name username avatar" },
       { path: "acceptedFriends.user", select: "name username avatar" },
       { path: "expenses.spentBy", select: "name username avatar" },
-      { path: "notes.createdBy", select: "username" },
-      { path: "todoList.createdBy", select: "username" },
-      { path: "todoList.assignedTo", select: "username" },
+      { path: "notes.createdBy", select: "username avatar" },
+      { path: "todoList.createdBy", select: "username avatar"},
+      { path: "todoList.assignedTo", select: "username avatar"},
       {
         path: "posts.post",
         populate: [
@@ -64,8 +65,9 @@ const getTripById = async (req, res) => {
     const posts = await Promise.all(
       trip.posts.map(
         async ({ post, addedAt, dayNumber, isHighlighted, highlightedBy }) => {
+          if (!post) return null; // Handle case where post might be null
           const likeCount = post.likes?.length || 0;
-          const commentCount = post.comments?.length || 0;
+          const commentCount = await Comment.countDocuments({ post: post._id });
 
           const isLikedByCurrentUser = post.likes.some(
             (id) => id.toString() === user._id.toString()
@@ -92,11 +94,17 @@ const getTripById = async (req, res) => {
 
     // Group by itinerary days
     const itinerary = posts.reduce((acc, post) => {
-      if (!post.dayNumber) return acc;
+      if (!post || !post.dayNumber) return acc;
       if (!acc[post.dayNumber]) acc[post.dayNumber] = [];
       acc[post.dayNumber].push(post);
       return acc;
     }, {});
+
+    // Calculate total comments for the trip
+    const totalComments = posts.reduce((acc, post) => {
+      if (!post) return acc;
+      return acc + (post.commentCount || 0);
+    }, 0);
 
     // Prepare main trip data object
     const rawTrip = {
@@ -143,6 +151,7 @@ const getTripById = async (req, res) => {
       },
       currentUser: currentUserFlags,
       totalLikes: trip.likes?.length || 0,
+      totalComments,
       tags: trip.tags || [],
       isArchived: trip.isArchived,
       itinerary,
