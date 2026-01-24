@@ -16,7 +16,7 @@ const tripsOfUser = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    const allTrips = await Trip.find({ user: userId }).populate(
+    const allTrips = await Trip.find({ user: userId, isArchived: { $ne: true } }).populate(
       [
         {
           path:"user",

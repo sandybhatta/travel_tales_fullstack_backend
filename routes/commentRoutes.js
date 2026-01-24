@@ -7,6 +7,8 @@ import getReply from "../Controllers/comment.controllers/getReply.js";
 import editComment from "../Controllers/comment.controllers/editComment.js";
 import likeUnlikeComment from "../Controllers/comment.controllers/likeunlikecomment.js";
 import getListOfLikeOfComment from "../Controllers/comment.controllers/getListOfLikeOfComment.js";
+import mentionedComments from "../Controllers/comment.controllers/mentionedComments.js";
+import deleteComment from "../Controllers/comment.controllers/deleteComment.js";
 
 const router = express.Router();
 
@@ -18,6 +20,10 @@ router.post("/:postId", protect , createRootComment)
 
 // reply to a comment or reply to a reply
 router.post("/:postId/:rootCommentId/:parentCommentId/reply", protect , replyOfComment)
+
+
+// get comments where the user is mentioned (MUST be before /:postId)
+router.get("/mentioned-comments", protect, mentionedComments)
 
 
 // get list of users who liked the comment
@@ -35,6 +41,9 @@ router.get("/:postId/:parentCommentId",protect , getReply)
 
 // edit a comment or reply
 router.patch("/:commentId", protect, editComment)
+
+// delete a comment
+router.delete("/:commentId", protect, deleteComment)
 
 
 

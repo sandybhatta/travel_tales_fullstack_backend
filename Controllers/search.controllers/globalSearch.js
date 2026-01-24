@@ -24,51 +24,84 @@ const globalSearch = async (req, res) => {
       .select("following closeFriends blockedUsers")
       .lean();
 
-    const followingIds = currentUser.following.map(id => id.toString());
-    
+    // Prepare Sets for O(1) lookups
+    const followingSet = new Set(currentUser.following.map(id => id.toString()));
+    const followerSet = new Set((currentUser.followers || []).map(id => id.toString()));
+    const closeFriendSet = new Set(currentUser.closeFriends.map(id => id.toString()));
     const blockedIds = currentUser.blockedUsers.map(id => id.toString());
 
-
-    const users = await User.find({
-      $or: [
-        { username: { $regex: query, $options: "i" } },
-        { name: { $regex: query, $options: "i" } },
-        { bio: { $regex: query, $options: "i" } },
-      ],
-      isDeactivated: { $ne: true },
-      _id: { $nin: [...blockedIds, userId] },
-      
-    })
-      .select("_id username name avatar  blockedUsers")
+    // Run searches in parallel for better performance
+    const [users, trips, posts] = await Promise.all([
+      // 1. Search Users
+      User.find({
+        $or: [
+          { username: { $regex: query, $options: "i" } },
+          { name: { $regex: query, $options: "i" } },
+          { bio: { $regex: query, $options: "i" } },
+        ],
+        isDeactivated: { $ne: true },
+        _id: { $nin: [...blockedIds, userId] },
+      })
+      .select("_id username name avatar blockedUsers followers following closeFriends") // Need these fields to determine relationship
       .limit(20)
-      .lean();
-      
-    const visibleUsers=users.filter((u)=>{
-        const blockedIdOfUser= (u.blockedUsers || []).map(id=>id.toString()) || []
-        if(blockedIdOfUser.includes(currentUser._id.toString())){
-            return false;
-        }
-        return true
-    })
+      .lean(),
 
-
-    
-    const trips = await Trip.find({
-      $and: [
-        {
-          $or: [
-            { title: { $regex: query, $options: "i" } },
-            { "destinations.city": { $regex: query, $options: "i" } },
-            { "destinations.country": { $regex: query, $options: "i" } },
-            { tags: { $in: [query] } },
-          ],
-        },
-        { isArchived: { $ne: true } },
-        { user: { $nin: blockedIds } },
-      ],
-    })
+      // 2. Search Trips
+      Trip.find({
+        $and: [
+          {
+            $or: [
+              { title: { $regex: query, $options: "i" } },
+              { "destinations.city": { $regex: query, $options: "i" } },
+              { "destinations.country": { $regex: query, $options: "i" } },
+              { tags: { $in: [query] } },
+            ],
+          },
+          { isArchived: { $ne: true } },
+          { user: { $nin: blockedIds } },
+        ],
+      })
       .populate("user", "username name avatar closeFriends blockedUsers")
-      .lean();
+      .lean(),
+
+      // 3. Search Posts
+      Post.find({
+        $and: [
+          {
+            $or: [
+              { caption: { $regex: query, $options: "i" } },
+              { hashtags: { $in: [query] } },
+              { "location.city": { $regex: query, $options: "i" } },
+              { "location.country": { $regex: query, $options: "i" } },
+            ],
+          },
+          { author: { $nin: blockedIds } },
+        ],
+      })
+      .populate("author", "username name avatar closeFriends blockedUsers")
+      .lean()
+    ]);
+
+    // Process Users (Filter blocked & Add relationship status)
+    const visibleUsers = users.filter((u) => {
+      const blockedIdOfUser = (u.blockedUsers || []).map(id => id.toString());
+      if (blockedIdOfUser.includes(userId.toString())) {
+        return false;
+      }
+      return true;
+    }).map(u => {
+      const uid = u._id.toString();
+      return {
+        _id: u._id,
+        username: u.username,
+        name: u.name,
+        avatar: u.avatar,
+        // Add relationship flags
+        isFollowing: followingSet.has(uid),
+        isFollower: followerSet.has(uid),
+        isCloseFriend: closeFriendSet.has(uid),
+      };
+    });
 
     const visibleTrips = trips.filter(trip => {
       if (!trip.user) return false;
@@ -93,7 +126,7 @@ const globalSearch = async (req, res) => {
         case "public":
           return true;
         case "followers":
-          return followingIds.includes(ownerId);
+          return followingSet.has(ownerId);
         case "close_friends":
           return ownerCloseFriendIds.includes(userId.toString());
         case "private":
@@ -102,23 +135,6 @@ const globalSearch = async (req, res) => {
           return false;
       }
     });
-
-    
-    const posts = await Post.find({
-      $and: [
-        {
-          $or: [
-            { caption: { $regex: query, $options: "i" } },
-            { hashtags: { $in: [query] } },
-            { "location.city": { $regex: query, $options: "i" } },
-            { "location.country": { $regex: query, $options: "i" } },
-          ],
-        },
-        { author: { $nin: blockedIds } },
-      ],
-    })
-      .populate("author", "username name avatar closeFriends blockedUsers")
-      .lean();
 
     const visiblePosts = posts.filter(post => {
       if (!post.author) return false;

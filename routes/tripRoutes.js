@@ -19,10 +19,7 @@ import getinvitedsOfTrip from "../Controllers/trip.controllers/getInvitedsOfTrip
 import removeInvite from "../Controllers/trip.controllers/removeInvite.js";
 import tripsOfUser from "../Controllers/trip.controllers/tripsOfUser.js";
 import tripsCollaborated from "../Controllers/trip.controllers/tripsCollaborated.js";
-import viewableTrip from "../Controllers/trip.controllers/virewableTrip.js";
-import getPublicTrips from "../Controllers/trip.controllers/getPublicTrips.js";
 import getTripsByTagname from "../Controllers/trip.controllers/getTripsByTag.js";
-import discoverFeed from "../Controllers/trip.controllers/discoverFeed.js";
 import getArchivedTrips from "../Controllers/trip.controllers/getArchivedTrips.js";
 import upcomingTrips from "../Controllers/trip.controllers/upcomingTrips.js";
 import onGoingTrips from "../Controllers/trip.controllers/onGoingTrips.js";
@@ -58,13 +55,13 @@ router.get("/status/upcoming", protect, upcomingTrips);
 router.get("/status/ongoing", protect, onGoingTrips);
 router.get("/status/past", protect, pastTrips);
 
-router.get("/archived", protect, getArchivedTrips);
+router.get("/archived-trips", protect, getArchivedTrips);
 router.delete("/archive-all", protect, softDeleteAll);
 router.patch("/restore-all", protect, restoreAllTrip);
 
-router.get("/visible", protect, viewableTrip);
-router.get("/public", getPublicTrips);
-router.get("/discover/feed", protect, discoverFeed);
+
+
+
 router.get("/tag/:tagname", protect, getTripsByTagname);
 
 router.get("/:userId/own-trip", protect, tripsOfUser);

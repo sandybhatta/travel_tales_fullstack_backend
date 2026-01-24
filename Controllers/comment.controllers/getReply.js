@@ -10,7 +10,7 @@ const getReply = async (req, res) => {
       return res.status(404).json({ message: "Parent comment not found or deleted" });
     }
 
-    const replies = await Comment.find({ parentComment: parentCommentId })
+    const replies = await Comment.find({ parentComment: parentCommentId, isDeleted: false })
       .sort({ createdAt: -1 }) 
       .populate([
         {

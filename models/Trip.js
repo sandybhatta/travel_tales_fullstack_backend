@@ -236,7 +236,7 @@ tripSchema.virtual("destinationCount").get(function () {
 
 // is the trip solo or collaborative
 tripSchema.virtual("isCollaborative").get(function () {
-    return this.acceptedFriends.length > 0;
+    return (this.acceptedFriends && this.acceptedFriends.length > 0) || false;
   });
  
   

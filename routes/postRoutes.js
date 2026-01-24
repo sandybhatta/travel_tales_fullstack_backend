@@ -9,10 +9,9 @@ import toggleLikePost from "../Controllers/post.controllers/togglelikePost.js";
 import getLikesOfPost from "../Controllers/post.controllers/getLikesOfPost.js";
 import postsLikedByUser from "../Controllers/post.controllers/postsLikedByUser.js";
 import mentionedPost from "../Controllers/post.controllers/mentionedPost.js";
+import taggedPosts from "../Controllers/post.controllers/taggedPosts.js";
 import myPost from "../Controllers/post.controllers/myPost.js";
 import postOfOthers from "../Controllers/post.controllers/postOfOthers.js";
-import feedOfFollowing from "../Controllers/post.controllers/feedOfFollowing.js";
-import exploreFeed from "../Controllers/post.controllers/exploreFeed.js";
 import deletePost from "../Controllers/post.controllers/deletePost.js";
 const router = express.Router();
 
@@ -38,17 +37,11 @@ router.get("/liked-posts" , protect , postsLikedByUser)
 // posts that the user has been mentioned
 router.get("/mentioned-posts", protect , mentionedPost)
 
+// posts that the user has been tagged in
+router.get("/tagged-posts", protect, taggedPosts)
 
 
 
-// feed of posts of following
-router.get("/feed/following", protect , feedOfFollowing)
-
-
-
-
-// feed for exploring
-router.get("/feed/explore" , protect , exploreFeed)
 
 
 

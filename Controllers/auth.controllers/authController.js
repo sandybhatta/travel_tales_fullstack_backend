@@ -344,9 +344,12 @@ export const resetPassword=async(req,res)=>{
  
  
 
-
    user.password=password
    await user.save()
+   
+   // Invalidate the OTP to prevent replay attacks
+   await otpOfUser.deleteOne();
+
    return res.status(200).send({message:"password have been changed successfully"})
 
   }catch(err){
@@ -367,25 +370,33 @@ export const changePassword = async(req,res)=>{
   }
 
   try{
-    if(req.user.isDeactivated){
+    // Fetch user with password field explicitly
+    const user = await User.findById(req.user._id).select("+password");
+
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    if(user.isDeactivated){
       return res.status(400).send({message:"cannot change password , user is deactivated"})
     }
-    const isMatch= await req.user.comparePassword(oldPassword)
+    const isMatch= await user.comparePassword(oldPassword)
 
     if(!isMatch){
       return res.status(400).send({message:"password did not match"})
     }
-    req.user.password=newPassword
-    await req.user.save()
+    user.password=newPassword
+    await user.save()
   
 
-    await sendPasswordChangedEmail(req.user.username, req.user.email);
+    await sendPasswordChangedEmail(user.username, user.email);
 
     return res.status(200).send({message:"password changed successfully"})
   
 
 
   }catch(error){
+    console.log(error);
     return res.status(500).send({message:"password did not changed, internal server error "})
 
   }
@@ -427,11 +438,8 @@ export const deactivateUser =async(req,res)=>{
       sameSite: "none",
     });
     
-    const token =await Token.findOne({userId:user._id})
-
-    if(token){
-      await token.deleteOne()
-    }
+    // Delete all tokens for this user
+    await Token.deleteMany({ userId: user._id });
     
     await sendDeactivateEmail(user.email,user.username)
 
@@ -450,11 +458,13 @@ return res.status(500).json({ message: "Something went wrong while deactivating 
 
 
 
-
 export const reactivateUser =  async(req,res)=>{
   
-    const user=req.user
-    const userId = user._id;
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).send({ message: "User ID is required" });
+    }
 
     try{
       const user = await User.findById(userId)
@@ -488,5 +498,9 @@ export const reactivateUser =  async(req,res)=>{
 export const getUserInfo =  async(req,res)=>{
   
     const user= req.user;
+    return res.status(200).json({
+      success: true,
+      user,
+    });
 
 }

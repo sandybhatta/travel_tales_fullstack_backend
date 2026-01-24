@@ -1,134 +1,70 @@
 
 import User from "../../models/User.js";
-import saveSearchHistory from "../../utils/saveSearchHistory.js"
-
+import saveSearchHistory from "../../utils/saveSearchHistory.js";
 
 const searchUsers = async (req, res) => {
   try {
     const q = (req.query.q || "").trim();
     if (!q) {
-      return res.status(400).json({ success: false, message: "Query  is required." });
+      return res
+        .status(400)
+        .json({ success: false, message: "Query is required." });
     }
 
-    const limit = Math.min(parseInt(req.query.limit) || 10, 50); 
+    const limit = Math.min(parseInt(req.query.limit) || 10, 50);
     const page = Math.max(parseInt(req.query.page) || 1, 1);
     const skip = (page - 1) * limit;
 
-    const searchQuery = q.toLowerCase();
-
+    // Get current user to check following status and blocked users
     const currentUser = await User.findById(req.user._id)
-      .select("following followers closeFriends blockedUsers")
+      .select("following blockedUsers")
       .lean();
 
     if (!currentUser) {
       return res.status(401).json({ success: false, message: "Unauthorized." });
     }
 
-   
-    const pipeline = [
-      {
-        $match: {
-          _id: { $ne: currentUser._id }, 
-          blockedUsers: { $ne: currentUser._id }, 
-        },
-      },
-      {
-        $addFields: {
-          _usernameLower: { $toLower: { $ifNull: ["$username", ""] } },
-          _nameLower: { $toLower: { $ifNull: ["$name", ""] } },
-        },
-      },
-      {
-        $match: {
-          $expr: {
-            $or: [
-              { $gt: [{ $indexOfCP: ["$_usernameLower", searchQuery] }, -1] },
-              { $gt: [{ $indexOfCP: ["$_nameLower", searchQuery] }, -1] },
-            ],
-          },
-        },
-      },
-  
-      {
-        $project: {
-          username: 1,
-          name: 1,
-          "avatar.url": 1,
-          bio: 1,
-          followers: 1,
-          following: 1,
-          closeFriends: 1,
-          _usernameLower: 0,
-          _nameLower: 0,
-          password: 0,
-          email: 0,
-          emailVerifyToken: 0,
-        },
-      },
-      { $sort: { createdAt: -1 } },
-      { $skip: skip },
-      { $limit: limit + 0 },
-    ];
-
-    const matchedUsers = await User.aggregate(pipeline).exec();
-
-    // If the current user has some blocked users then filter them out (users blocked by this user)
-    const blockedByCurrent = (currentUser.blockedUsers || []).map((id) => id.toString());
-    const filteredUsers = matchedUsers.filter(
-      (u) => !blockedByCurrent.includes(String(u._id))
+    const blockedIds = (currentUser.blockedUsers || []).map((id) =>
+      id.toString()
+    );
+    const followingSet = new Set(
+      (currentUser.following || []).map((id) => id.toString())
     );
 
-    
-    const followingSet = new Set((currentUser.following || []).map((id) => id.toString()));
-    const followerSet = new Set((currentUser.followers || []).map((id) => id.toString()));
-    const closeFriendSet = new Set((currentUser.closeFriends || []).map((id) => id.toString()));
+    // Construct Query
+    const query = {
+      _id: { $nin: [...blockedIds, currentUser._id] }, // Exclude self and users blocked by me
+      $or: [
+        { username: { $regex: q, $options: "i" } },
+        { name: { $regex: q, $options: "i" } },
+      ],
+      blockedUsers: { $ne: currentUser._id }, // Exclude users who blocked me
+    };
 
-    const results = filteredUsers.map((u) => {
-      const uid = u._id.toString();
-      return {
-        _id: u._id,
-        username: u.username,
-        name: u.name,
-        avatar: u.avatar?.url || (u.avatar || null),
-        isFollowing: followingSet.has(uid),
-        isFollower: followerSet.has(uid),
-        isCloseFriend: closeFriendSet.has(uid),
-      };
-    });
+    // Find Users
+    const users = await User.find(query)
+      .select("username name avatar")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
 
-    
+    // Count Total (for pagination)
+    const total = await User.countDocuments(query);
+
+    // Format Results
+    const results = users.map((u) => ({
+      _id: u._id,
+      username: u.username,
+      name: u.name,
+      avatar: u.avatar,
+      isFollowing: followingSet.has(u._id.toString()),
+    }));
+
+    // Save History (Async)
     saveSearchHistory(req.user._id, q, "user").catch((err) => {
       console.error("Failed to save search history:", err.message || err);
     });
-
-    const countPipeline = [
-      {
-        $match: {
-          _id: { $ne: currentUser._id },
-          blockedUsers: { $ne: currentUser._id },
-        },
-      },
-      {
-        $addFields: {
-          _usernameLower: { $toLower: { $ifNull: ["$username", ""] } },
-          _nameLower: { $toLower: { $ifNull: ["$name", ""] } },
-        },
-      },
-      {
-        $match: {
-          $expr: {
-            $or: [
-              { $gt: [{ $indexOfCP: ["$_usernameLower", searchQuery] }, -1] },
-              { $gt: [{ $indexOfCP: ["$_nameLower", searchQuery] }, -1] },
-            ],
-          },
-        },
-      },
-      { $count: "total" },
-    ];
-
-    const countResult = await User.aggregate(countPipeline).exec();
-    const total = countResult[0]?.total || 0;
 
     return res.status(200).json({
       success: true,
@@ -148,9 +84,3 @@ const searchUsers = async (req, res) => {
 };
 
 export default searchUsers;
-
-
-
-
-
-

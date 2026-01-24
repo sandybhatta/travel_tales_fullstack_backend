@@ -24,11 +24,11 @@ const userProfile = async (req, res) => {
     }
 
     const isBlocked = targetUser.blockedUsers?.some(
-      (uid) => uid.toString() === user._id.toString()
+      (uid) => uid && uid.toString() === user._id.toString()
     );
 
     const hasBlocked = user.blockedUsers?.some(
-      (uid) => uid.toString() === targetUser._id.toString()
+      (uid) => uid && uid.toString() === targetUser._id.toString()
     );
 
     if (isBlocked || hasBlocked) {
@@ -40,26 +40,27 @@ const userProfile = async (req, res) => {
     const viewerId = user._id.toString();
     const targetId = targetUser._id.toString();
 
+    // Safely map arrays handling potential nulls
     const viewerFollowingIds = (user.following || []).map((uid) =>
-      uid.toString()
+      uid ? uid.toString() : ""
     );
     const viewerFollowerIds = (user.followers || []).map((uid) =>
-      uid.toString()
+      uid ? uid.toString() : ""
     );
 
     const targetFollowerIds = (targetUser.followers || []).map((uid) =>
-      uid.toString()
+      uid ? uid.toString() : ""
     );
 
     const isSelf = viewerId === targetId;
     const isFollowing = viewerFollowingIds.includes(targetId);
     const isFollower = viewerFollowerIds.includes(targetId);
     const isCloseFriend =
-      user.closeFriends?.some((uid) => uid.toString() === targetId) ||
+      user.closeFriends?.some((uid) => uid && uid.toString() === targetId) ||
       false;
 
     const mutualFollowersCount = targetFollowerIds.filter((fid) =>
-      viewerFollowerIds.includes(fid)
+      fid && viewerFollowerIds.includes(fid)
     ).length;
 
     const viewerRelationship = {
@@ -77,19 +78,19 @@ const userProfile = async (req, res) => {
       const myPosts = await Post.find({ author: id })
         .sort({ createdAt: -1 })
         .limit(5)
-        .select("_id caption createdAt visibility tripId");
+        .select("_id caption createdAt visibility tripId media"); // Added media for better preview if needed
 
       const likedPosts = await Post.find({ likes: id })
         .sort({ createdAt: -1 })
         .limit(5)
-        .select("_id caption createdAt visibility tripId");
+        .select("_id caption createdAt visibility tripId media");
 
       const collaboratedTrips = await Trip.find({
         "acceptedFriends.user": id,
       })
         .sort({ createdAt: -1 })
         .limit(5)
-        .select("_id title startDate endDate visibility");
+        .select("_id title startDate endDate visibility photoUrl acceptedFriends");
 
       // Calculate Username Change Eligibility
       const lastChangeDate = targetUser.usernameChangedAt;
@@ -99,12 +100,15 @@ const userProfile = async (req, res) => {
       if (lastChangeDate) {
         const now = new Date();
         const lastChange = new Date(lastChangeDate);
-        const diffTime = Math.abs(now - lastChange);
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffDays < 30) {
-          canChangeUsername = false;
-          daysRemainingForUsername = 30 - diffDays;
+        
+        if (!isNaN(lastChange.getTime())) {
+             const diffTime = Math.abs(now - lastChange);
+             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+             if (diffDays < 30) {
+               canChangeUsername = false;
+               daysRemainingForUsername = 30 - diffDays;
+             }
         }
       }
 
@@ -127,8 +131,9 @@ const userProfile = async (req, res) => {
       });
     }
 
+    // Safely access profileVisibility with optional chaining
     const profileVisibility =
-      targetUser.privacy.profileVisibility || "public";
+      targetUser.privacy?.profileVisibility || "public";
 
     if (profileVisibility === "followers") {
       if (!viewerFollowingIds.includes(targetUser._id.toString())) {
@@ -137,10 +142,15 @@ const userProfile = async (req, res) => {
             name: targetUser.name,
             username: targetUser.username,
             avatar: targetUser.avatar,
+            _id: targetUser._id // Ensure ID is sent for frontend links
           },
           privacy: "followers",
           criteriaMet: false,
           viewerRelationship,
+          postCount, // Send counts even if private, usually standard behavior
+          tripCount,
+          followerCount: targetUser.followers.length,
+          followingCount: targetUser.following.length,
         });
       }
     }
@@ -154,28 +164,39 @@ const userProfile = async (req, res) => {
           name: targetUser.name,
           username: targetUser.username,
           avatar: targetUser.avatar,
+          _id: targetUser._id
         },
         privacy: "private",
         criteriaMet: false,
         viewerRelationship,
+        postCount,
+        tripCount,
+        followerCount: targetUser.followers.length,
+        followingCount: targetUser.following.length,
       });
     }
 
     if (profileVisibility === "close_friends") {
-      const isCloseFriend = targetUser.closeFriends?.some(
-        (uid) => uid.toString() === user._id.toString()
+      // Logic fix: Check if viewer is in targetUser's closeFriends list
+      const isViewerCloseFriend = targetUser.closeFriends?.some(
+        (uid) => uid && uid.toString() === user._id.toString()
       );
 
-      if (!isCloseFriend) {
+      if (!isViewerCloseFriend) {
         return res.status(200).json({
           user: {
             name: targetUser.name,
             username: targetUser.username,
             avatar: targetUser.avatar,
+            _id: targetUser._id
           },
           privacy: "close_friends",
           criteriaMet: false,
           viewerRelationship,
+          postCount,
+          tripCount,
+          followerCount: targetUser.followers.length,
+          followingCount: targetUser.following.length,
         });
       }
     }
@@ -190,6 +211,7 @@ const userProfile = async (req, res) => {
       viewerRelationship,
     });
   } catch (error) {
+    console.error("Error in userProfile:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

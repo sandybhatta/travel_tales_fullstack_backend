@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { buildCommentTree } from "../utils/buildCommentTree.js";
+
 const commentSchema = new mongoose.Schema(
   {
     post: {
@@ -67,10 +67,6 @@ commentSchema.methods.isLikedBy = function (userId) {
   
   //is reply virtual method to send in response
 
-  commentSchema.virtual("isReply").get(function () {
-    return !!this.parentComment;
-  });
-
 //   Instance Method: For internal logic
 
 
@@ -85,6 +81,12 @@ commentSchema.methods.softDelete = async function () {
     this.content = "[deleted]";
   
     await this.save();
+
+    // Recursively soft-delete children
+    const children = await this.model("Comment").find({ parentComment: this._id });
+    for (const child of children) {
+        await child.softDelete();
+    }
   
     return this; // return the updated comment if needed
   };
@@ -92,13 +94,6 @@ commentSchema.methods.softDelete = async function () {
  
  
   
-  commentSchema.statics.getThread = async function (postId) {
-    const comments = await this.find({ post: postId })
-      .sort({ createdAt: 1 })
-      .lean(); // faster for tree building
-    return buildCommentTree(comments);
-  };
-
 // Add index for performance
 commentSchema.index({ post: 1 });
 commentSchema.index({ parentComment: 1 });

@@ -29,6 +29,7 @@ import getAllAcceptedTrips from "../Controllers/user.controllers/getAllAcceptedT
 import rejectInvitation from "../Controllers/user.controllers/rejectInvitation.js"
 import getUsersToFollow from "../Controllers/user.controllers/getUsersToFollow.js"
 import userProfile from "../Controllers/user.controllers/userProfile.js"
+import getUniversalFeed from "../Controllers/user.controllers/getUniversalFeed.js"
 
 import { updatePrivacy } from "../Controllers/settings.controllers/updatePrivacy.js";
 import { updateAccountStatus } from "../Controllers/settings.controllers/accountSettings.js";
@@ -55,6 +56,10 @@ import getLikedTrips from "../Controllers/activity.controllers/getLikedTrips.js"
 
 
 const router=express.Router()
+
+
+// Universal Feed
+router.get("/feed", protect, getUniversalFeed)
 
 
 // to delete the user and the documents from other models too

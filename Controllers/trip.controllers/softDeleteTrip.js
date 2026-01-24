@@ -10,7 +10,7 @@ const user = req.user;
 
 try {
     
-    const trip = await Trip.findById(tripId).select("isArchived")
+    const trip = await Trip.findById(tripId).select("isArchived user")
 
     if(!trip){
         return res.status(404).json({message:"trip not found"})

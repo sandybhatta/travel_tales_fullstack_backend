@@ -47,16 +47,16 @@ const mutualFollowers = async (req, res) => {
         return res.status(403).json({ message: "Follow the user to see mutual followers" });
       }
     }
-    if(visibility==="close_friends"){
+    if (profileVisibility === "close_friends") {
+      const isCloseFriends = target.closeFriends?.some(
+        (uid) => uid.toString() === user._id.toString()
+      );
 
-        const isCloseFriends= target.closeFriends?.some(uid=>uid.toString() === user._id.toString())
-
-        if(!isCloseFriends){
-            return res.status(403).json({
-                message: "Only close friends can view this user's followings",
-              });
-        }
-
+      if (!isCloseFriends) {
+        return res.status(403).json({
+          message: "Only close friends can view this user's followings",
+        });
+      }
     }
     // Calculate mutual followers using Set
     // because in set the .has() method is O(1)

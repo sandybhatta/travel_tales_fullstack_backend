@@ -132,6 +132,12 @@ postSchema.pre("deleteOne", { document: true }, async function (next) {
       { sharedFrom: postId },
       { sharedFrom: null }
     );
+
+    // Remove post from Trip
+    await mongoose.model("Trip").updateMany(
+      { "posts.post": postId },
+      { $pull: { posts: { post: postId } } }
+    );
   
     // Delete media from Cloudinary
     for (let file of this.media) {
