@@ -13,6 +13,8 @@ import postRoutes from "./routes/postRoutes.js"
 import commentRoutes  from "./routes/commentRoutes.js"
 import searchRoutes from "./routes/searchRoutes.js"
 import { scheduleTripCompletion } from "./cronJob/scheduleTripCompletion.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./swagger.js";
 
 
 dotenv.config();
@@ -55,6 +57,9 @@ console.log("BREVO_API_KEY exists:", !!process.env.BREVO_API_KEY);
 app.get("/", (req, res) => {
   res.send(" API is running...");
 });
+
+// Swagger UI Route
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 
