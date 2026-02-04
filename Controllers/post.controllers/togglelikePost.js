@@ -10,7 +10,7 @@ const toggleLikePost = async (req, res) => {
 
     
 
-    const post = await Post.findById(postId).select("likes user");
+    const post = await Post.findById(postId).select("likes author");
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
@@ -27,10 +27,10 @@ const toggleLikePost = async (req, res) => {
     await post.save();
 
     // Create Notification
-    if (post.user.toString() !== user._id.toString()) {
+    if (post.author.toString() !== user._id.toString()) {
       try {
         const notification = new Notification({
-          recipient: post.user,
+          recipient: post.author,
           sender: user._id,
           type: "like_post",
           relatedPost: post._id,
@@ -38,7 +38,7 @@ const toggleLikePost = async (req, res) => {
         });
         await notification.save();
 
-        const receiverSocketId = getReceiverSocketId(post.user.toString());
+        const receiverSocketId = getReceiverSocketId(post.author.toString());
         if (receiverSocketId) {
           await notification.populate("sender", "username profilePic");
           await notification.populate("relatedPost", "images");

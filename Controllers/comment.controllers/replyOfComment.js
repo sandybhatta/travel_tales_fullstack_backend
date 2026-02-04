@@ -1,6 +1,8 @@
 import Post from "../../models/Post.js";
 import Comment from "../../models/Comment.js";
 import User from "../../models/User.js";
+import { io, getReceiverSocketId } from "../../socket/socket.js";
+import Notification from "../../models/Notification.js";
 
 const replyOfComment = async (req, res) => {
   try {
@@ -88,6 +90,30 @@ const replyOfComment = async (req, res) => {
       rootComment: rootComment._id,
       mentions,
     });
+
+    // Notify Parent Comment Author
+    if (parentComment.author.toString() !== user._id.toString()) {
+      try {
+        const notification = new Notification({
+          recipient: parentComment.author,
+          sender: user._id,
+          type: "reply_comment",
+          relatedPost: post._id,
+          relatedComment: newReply._id,
+          message: `${user.username} replied to your comment.`
+        });
+        await notification.save();
+
+        const receiverSocketId = getReceiverSocketId(parentComment.author.toString());
+        if (receiverSocketId) {
+          await notification.populate("sender", "username profilePic");
+          await notification.populate("relatedPost", "images"); 
+          io.to(receiverSocketId).emit("newNotification", notification);
+        }
+      } catch (e) {
+        console.error("Error sending reply notification:", e);
+      }
+    }
 
     return res.status(201).json({
       message: "Reply created successfully.",
