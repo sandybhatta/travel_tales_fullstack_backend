@@ -1,8 +1,7 @@
 import Post from "../../models/Post.js";
 import Comment from "../../models/Comment.js";
 import User from "../../models/User.js";
-import { io, getReceiverSocketId } from "../../socket/socket.js";
-import Notification from "../../models/Notification.js";
+import { createNotification } from "../../utils/notificationHandler.js";
 
 const createRootComment = async (req, res) => {
   try {
@@ -76,51 +75,28 @@ const createRootComment = async (req, res) => {
 
     // Create Notification for Post Author
     if (post.author._id.toString() !== user._id.toString()) {
-      try {
-        const notification = new Notification({
+      await createNotification({
           recipient: post.author._id,
           sender: user._id,
           type: "comment_post",
           relatedPost: post._id,
           relatedComment: newComment._id,
           message: `${user.username} commented on your post.`
-        });
-        await notification.save();
-
-        const receiverSocketId = getReceiverSocketId(post.author._id.toString());
-        if (receiverSocketId) {
-           await notification.populate("sender", "username profilePic");
-           await notification.populate("relatedPost", "images");
-           io.to(receiverSocketId).emit("newNotification", notification);
-        }
-      } catch (err) {
-        console.error("Notification Error:", err);
-      }
+      });
     }
 
     // Handle Mentions Notifications
     if (mentions.length > 0) {
-       // Loop through mentioned users and send notifications
-       // (Implementation simplified for brevity, but should check if mentioned user != author to avoid duplicates if logic changes)
        mentions.forEach(async (mentionedUserId) => {
            if (mentionedUserId.toString() !== user._id.toString()) {
-                try {
-                    const notification = new Notification({
-                        recipient: mentionedUserId,
-                        sender: user._id,
-                        type: "comment_post", // Or specific "mention_comment" type if added to enum
-                        relatedPost: post._id,
-                        relatedComment: newComment._id,
-                        message: `${user.username} mentioned you in a comment.`
-                    });
-                    await notification.save();
-                    const sId = getReceiverSocketId(mentionedUserId.toString());
-                    if (sId) {
-                        await notification.populate("sender", "username profilePic");
-                        await notification.populate("relatedPost", "images");
-                        io.to(sId).emit("newNotification", notification);
-                    }
-                } catch (e) { console.error(e); }
+                await createNotification({
+                    recipient: mentionedUserId,
+                    sender: user._id,
+                    type: "mention_in_comment",
+                    relatedPost: post._id,
+                    relatedComment: newComment._id,
+                    message: `${user.username} mentioned you in a comment.`
+                });
            }
        });
     }

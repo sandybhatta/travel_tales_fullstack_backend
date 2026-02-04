@@ -1,6 +1,5 @@
 import Comment from "../../models/Comment.js";
-import { io, getReceiverSocketId } from "../../socket/socket.js";
-import Notification from "../../models/Notification.js";
+import { createNotification } from "../../utils/notificationHandler.js";
 
 const likeUnlikeComment = async (req, res) => {
   try {
@@ -25,29 +24,14 @@ const likeUnlikeComment = async (req, res) => {
 
       // Notification Logic
       if (comment.author.toString() !== user._id.toString()) {
-        try {
-          const notification = new Notification({
+        await createNotification({
             recipient: comment.author,
             sender: user._id,
             type: "like_comment",
             relatedPost: comment.post,
             relatedComment: comment._id,
             message: `${user.username} liked your comment.`
-          });
-          await notification.save();
-
-          const receiverSocketId = getReceiverSocketId(comment.author.toString());
-          if (receiverSocketId) {
-            await notification.populate("sender", "username profilePic");
-            // If the UI displays the post image for context:
-            if (comment.post) {
-               await notification.populate("relatedPost", "images");
-            }
-            io.to(receiverSocketId).emit("newNotification", notification);
-          }
-        } catch (e) {
-          console.error("Error creating like_comment notification:", e);
-        }
+        });
       }
     }
 

@@ -1,6 +1,7 @@
 import Trip from "../../models/Trip.js";
 import User from "../../models/User.js";
 import { uploadToCloudinary } from "../../utils/cloudinary.js";
+import { createNotification } from "../../utils/notificationHandler.js";
 
 const createTrip = async (req, res) => {
   const user = req.user;
@@ -225,6 +226,35 @@ const createTrip = async (req, res) => {
     // 12. Create and save trip
     const newTrip = new Trip(tripBody);
     await newTrip.save();
+
+    // Notify Invited Friends
+    if (validInvitedFriends.length > 0) {
+        await Promise.all(validInvitedFriends.map(async (inviteeId) => {
+            await createNotification({
+                recipient: inviteeId,
+                sender: user._id,
+                type: "trip_invite",
+                relatedTrip: newTrip._id,
+                message: `${user.username} invited you to join '${newTrip.title}'`
+            });
+        }));
+    }
+
+    // Notify Followers (New Trip)
+    if (["public", "followers"].includes(newTrip.visibility)) {
+        const authorWithFollowers = await User.findById(user._id).select("followers");
+        if (authorWithFollowers && authorWithFollowers.followers.length > 0) {
+            await Promise.all(authorWithFollowers.followers.map(async (followerId) => {
+                 await createNotification({
+                    recipient: followerId,
+                    sender: user._id,
+                    type: "new_trip_from_following",
+                    relatedTrip: newTrip._id,
+                    message: `${user.username} created a new trip.`
+                });
+            }));
+        }
+    }
 
     return res
       .status(201)

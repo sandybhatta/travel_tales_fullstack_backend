@@ -5,7 +5,20 @@ const notificationSchema = new mongoose.Schema({
     sender: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     type: { 
         type: String, 
-        enum: ["like_post", "like_trip", "comment_post", "follow", "trip_invite", "reply_comment", "like_comment"], 
+        enum: [
+            "like_post", 
+            "like_trip", 
+            "comment_post", 
+            "follow", 
+            "trip_invite", 
+            "reply_comment", 
+            "like_comment",
+            "tagged_in_post",
+            "mention_in_caption",
+            "mention_in_comment",
+            "new_post_from_following",
+            "new_trip_from_following"
+        ], 
         required: true 
     },
     relatedPost: { type: mongoose.Schema.Types.ObjectId, ref: "Post" },

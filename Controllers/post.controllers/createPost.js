@@ -1,6 +1,8 @@
 import Post from "../../models/Post.js";
 import { uploadToCloudinary } from "../../utils/cloudinary.js";
 import Trip from "../../models/Trip.js";
+import User from "../../models/User.js";
+import { createNotification } from "../../utils/notificationHandler.js";
 
 const createPost = async (req, res) => {
   try {
@@ -127,6 +129,55 @@ const createPost = async (req, res) => {
       });
       await trip.save()
     }
+
+    // --- Notifications Logic ---
+
+    // 1. Tagged Users
+    if (validTaggedUsers.length > 0) {
+        await Promise.all(validTaggedUsers.map(async (taggedUserId) => {
+            await createNotification({
+                recipient: taggedUserId,
+                sender: user._id,
+                type: "tagged_in_post",
+                relatedPost: newPost._id,
+                message: `${user.username} tagged you in a post.`
+            });
+        }));
+    }
+
+    // 2. Mentions in Caption
+    if (mentions && mentions.length > 0) {
+        await Promise.all(mentions.map(async (mentionedUserId) => {
+             // Only notify if not already tagged (to avoid duplicates if logic overlaps, though strict usage suggests they are distinct)
+             // We cast to string for comparison just in case
+             if (!validTaggedUsers.some(id => id.toString() === mentionedUserId.toString())) {
+                await createNotification({
+                    recipient: mentionedUserId,
+                    sender: user._id,
+                    type: "mention_in_caption",
+                    relatedPost: newPost._id,
+                    message: `${user.username} mentioned you in a caption.`
+                });
+             }
+        }));
+    }
+
+    // 3. Notify Followers (New Post)
+    if (["public", "followers"].includes(newPost.visibility)) {
+        const authorWithFollowers = await User.findById(user._id).select("followers");
+        if (authorWithFollowers && authorWithFollowers.followers.length > 0) {
+            await Promise.all(authorWithFollowers.followers.map(async (followerId) => {
+                 await createNotification({
+                    recipient: followerId,
+                    sender: user._id,
+                    type: "new_post_from_following",
+                    relatedPost: newPost._id,
+                    message: `${user.username} created a new post.`
+                });
+            }));
+        }
+    }
+    // ---------------------------
 
     res.status(201).json({ message: "Post created", post: newPost });
   } catch (err) {

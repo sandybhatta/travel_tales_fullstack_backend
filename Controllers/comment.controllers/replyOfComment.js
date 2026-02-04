@@ -1,8 +1,7 @@
 import Post from "../../models/Post.js";
 import Comment from "../../models/Comment.js";
 import User from "../../models/User.js";
-import { io, getReceiverSocketId } from "../../socket/socket.js";
-import Notification from "../../models/Notification.js";
+import { createNotification } from "../../utils/notificationHandler.js";
 
 const replyOfComment = async (req, res) => {
   try {
@@ -93,26 +92,30 @@ const replyOfComment = async (req, res) => {
 
     // Notify Parent Comment Author
     if (parentComment.author.toString() !== user._id.toString()) {
-      try {
-        const notification = new Notification({
+      await createNotification({
           recipient: parentComment.author,
           sender: user._id,
           type: "reply_comment",
           relatedPost: post._id,
           relatedComment: newReply._id,
           message: `${user.username} replied to your comment.`
-        });
-        await notification.save();
+      });
+    }
 
-        const receiverSocketId = getReceiverSocketId(parentComment.author.toString());
-        if (receiverSocketId) {
-          await notification.populate("sender", "username profilePic");
-          await notification.populate("relatedPost", "images"); 
-          io.to(receiverSocketId).emit("newNotification", notification);
-        }
-      } catch (e) {
-        console.error("Error sending reply notification:", e);
-      }
+    // Notify Mentioned Users
+    if (mentions.length > 0) {
+        mentions.forEach(async (mentionedUserId) => {
+             if (mentionedUserId.toString() !== user._id.toString()) {
+                await createNotification({
+                    recipient: mentionedUserId,
+                    sender: user._id,
+                    type: "mention_in_comment",
+                    relatedPost: post._id,
+                    relatedComment: newReply._id,
+                    message: `${user.username} mentioned you in a reply.`
+                });
+             }
+        });
     }
 
     return res.status(201).json({

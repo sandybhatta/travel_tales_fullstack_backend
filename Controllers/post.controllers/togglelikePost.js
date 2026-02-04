@@ -1,7 +1,6 @@
 
 import Post from "../../models/Post.js";
-import { io, getReceiverSocketId } from "../../socket/socket.js";
-import Notification from "../../models/Notification.js";
+import { createNotification } from "../../utils/notificationHandler.js";
 
 const toggleLikePost = async (req, res) => {
   try {
@@ -28,26 +27,13 @@ const toggleLikePost = async (req, res) => {
 
     // Create Notification
     if (post.author.toString() !== user._id.toString()) {
-      try {
-        const notification = new Notification({
+      await createNotification({
           recipient: post.author,
           sender: user._id,
           type: "like_post",
           relatedPost: post._id,
           message: `${user.username} liked your post.`
-        });
-        await notification.save();
-
-        const receiverSocketId = getReceiverSocketId(post.author.toString());
-        if (receiverSocketId) {
-          await notification.populate("sender", "username profilePic");
-          await notification.populate("relatedPost", "images");
-          io.to(receiverSocketId).emit("newNotification", notification);
-        }
-      } catch (notifError) {
-        console.error("Error creating notification:", notifError);
-        // Don't block the response if notification fails
-      }
+      });
     }
 
     return res.status(200).json({ hasLiked: true });

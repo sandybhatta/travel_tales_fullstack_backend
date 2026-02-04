@@ -1,6 +1,5 @@
 import Trip from "../../models/Trip.js";
-import { io, getReceiverSocketId } from "../../socket/socket.js";
-import Notification from "../../models/Notification.js";
+import { createNotification } from "../../utils/notificationHandler.js";
 
 const inviteToTrip = async (req, res) => {
   const { tripId } = req.params;
@@ -52,23 +51,13 @@ const inviteToTrip = async (req, res) => {
     await trip.save()
     
     // Notification Logic
-    try {
-        const notification = new Notification({
-            recipient: invitee,
-            sender: user._id,
-            type: "trip_invite",
-            relatedTrip: trip._id,
-            message: `${user.username} invited you to join '${trip.title}'`
-        });
-        await notification.save();
-
-        const receiverSocketId = getReceiverSocketId(invitee.toString());
-        if (receiverSocketId) {
-            await notification.populate("sender", "username profilePic");
-            await notification.populate("relatedTrip", "coverPhoto");
-            io.to(receiverSocketId).emit("newNotification", notification);
-        }
-    } catch (e) { console.error(e); }
+    await createNotification({
+        recipient: invitee,
+        sender: user._id,
+        type: "trip_invite",
+        relatedTrip: trip._id,
+        message: `${user.username} invited you to join '${trip.title}'`
+    });
 
 
 

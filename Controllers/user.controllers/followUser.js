@@ -1,6 +1,5 @@
 import User from "../../models/User.js";
-import { io, getReceiverSocketId } from "../../socket/socket.js";
-import Notification from "../../models/Notification.js";
+import { createNotification } from "../../utils/notificationHandler.js";
 
 const followUser = async (req, res) => {
   const { id } = req.params;
@@ -57,23 +56,12 @@ const followUser = async (req, res) => {
     await targetUser.save();
 
     // Optional: Trigger notification
-    try {
-      const notification = new Notification({
+    await createNotification({
         recipient: targetUser._id,
         sender: user._id,
         type: "follow",
         message: `${user.username} started following you.`
-      });
-      await notification.save();
-
-      const receiverSocketId = getReceiverSocketId(targetUser._id.toString());
-      if (receiverSocketId) {
-        await notification.populate("sender", "username profilePic");
-        io.to(receiverSocketId).emit("newNotification", notification);
-      }
-    } catch (notifError) {
-      console.error("Error creating notification:", notifError);
-    }
+    });
 
     return res.status(200).json({ message: `Now following ${targetUser.username}` });
   } catch (error) {
