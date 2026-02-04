@@ -125,7 +125,7 @@ const userSchema = new mongoose.Schema(
       {
         badgeId: { type: mongoose.Schema.Types.ObjectId, ref: "Badge" },
         earnedAt: { type: Date, default: Date.now },
-        isNew: { type: Boolean, default: true } // For showing "New Badge!" UI notification
+        isNewBadge: { type: Boolean, default: true } // For showing "New Badge!" UI notification
       }
     ],
 
