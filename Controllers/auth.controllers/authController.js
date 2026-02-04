@@ -161,7 +161,10 @@ if(otpOfUser && otpOfUser.expiresAt > Date.now() ){
 
 }catch(error){
     console.error("Login Error:", error);
-    return res.status(500).send({message:"Server error"})
+    return res.status(500).send({
+      message: `Server error: ${error.message}`, // Include error in message for frontend visibility
+      error: error.message 
+    })
 }
 
 

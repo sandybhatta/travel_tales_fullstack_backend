@@ -36,15 +36,20 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
   process.env.CLIENT_LIVE_URL,             
   "https://www.traveltalesapp.in",     
-  "http://localhost:5173",        
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://localhost:5174",        
 ];
 
 app.use(cors({
     origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
         
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (allowedOrigins.includes(origin)) {
           callback(null, true);
         } else {
+          console.log("Blocked by CORS:", origin); // Debugging log
           callback(new Error("Not allowed by CORS"));
         }
     },
