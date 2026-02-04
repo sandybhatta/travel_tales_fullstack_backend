@@ -1,4 +1,6 @@
 import Trip from "../../models/Trip.js";
+import { io, getReceiverSocketId } from "../../socket/socket.js";
+import Notification from "../../models/Notification.js";
 
 const toggleLike = async (req, res) => {
   try {
@@ -16,6 +18,27 @@ const toggleLike = async (req, res) => {
       trip.likes = trip.likes.filter(id => id.toString() !== user._id.toString());
     } else {
       trip.likes.push(user._id);
+
+      // Notification Logic
+      if (trip.user.toString() !== user._id.toString()) {
+          try {
+            const notification = new Notification({
+                recipient: trip.user,
+                sender: user._id,
+                type: "like_trip",
+                relatedTrip: trip._id,
+                message: `${user.username} liked your trip.`
+            });
+            await notification.save();
+
+            const receiverSocketId = getReceiverSocketId(trip.user.toString());
+            if (receiverSocketId) {
+                await notification.populate("sender", "username profilePic");
+                await notification.populate("relatedTrip", "coverPhoto"); 
+                io.to(receiverSocketId).emit("newNotification", notification);
+            }
+          } catch (e) { console.error(e); }
+      }
     }
 
     await trip.save();
