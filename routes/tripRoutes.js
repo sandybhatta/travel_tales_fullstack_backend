@@ -122,6 +122,8 @@ router.delete("/archive-all", protect, softDeleteAll);
  */
 router.patch("/restore-all", protect, restoreAllTrip);
 
+router.post("/backfill-chats", protect, backfillTripChats);
+
 /**
  * @swagger
  * /api/trips/tag/{tagname}:

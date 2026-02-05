@@ -70,6 +70,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 import notificationRoutes from "./routes/notificationRoutes.js"
+import chatRoutes from "./routes/chatRoutes.js"
+import messageRoutes from "./routes/messageRoutes.js"
 
 
 app.use(express.json());
@@ -87,6 +89,8 @@ app.use("/api/comment",commentRoutes)
 app.use('/api/search',searchRoutes)
 
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/message", messageRoutes);
 
 
 

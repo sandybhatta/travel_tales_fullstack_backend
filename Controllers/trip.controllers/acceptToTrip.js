@@ -1,4 +1,5 @@
 import Trip from "../../models/Trip.js";
+import Chat from "../../models/Chat.js";
 
 const acceptToTrip = async (req, res) => {
   const { tripId } = req.params;
@@ -34,6 +35,12 @@ const acceptToTrip = async (req, res) => {
 
     // 
     await trip.acceptInvitation(user._id);
+
+    // Add user to Trip Chat
+    await Chat.findOneAndUpdate(
+      { tripId: trip._id },
+      { $addToSet: { users: user._id } }
+    );
 
     return res
       .status(200)

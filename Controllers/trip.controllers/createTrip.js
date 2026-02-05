@@ -1,5 +1,6 @@
 import Trip from "../../models/Trip.js";
 import User from "../../models/User.js";
+import Chat from "../../models/Chat.js";
 import { uploadToCloudinary } from "../../utils/cloudinary.js";
 import { createNotification } from "../../utils/notificationHandler.js";
 
@@ -226,6 +227,18 @@ const createTrip = async (req, res) => {
     // 12. Create and save trip
     const newTrip = new Trip(tripBody);
     await newTrip.save();
+
+    // Create Trip Group Chat
+    await Chat.create({
+      chatName: newTrip.title,
+      isGroupChat: true,
+      isTripChat: true,
+      users: [user._id],
+      groupAdmin: user._id,
+      tripId: newTrip._id,
+      description: `Group chat for trip: ${newTrip.title}`,
+      chatImage: newTrip.coverPhoto ? newTrip.coverPhoto.url : "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"
+    });
 
     // Notify Invited Friends
     if (validInvitedFriends.length > 0) {

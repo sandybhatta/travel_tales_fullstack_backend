@@ -1,5 +1,6 @@
 import Trip from "../../models/Trip.js";
 import User from "../../models/User.js";
+import Chat from "../../models/Chat.js";
 
 const removeCollaborator = async (req, res) => {
   const { tripId, userId } = req.params;
@@ -30,6 +31,12 @@ const removeCollaborator = async (req, res) => {
       friend => friend.user.toString() !== userId.toString()
     );
     await trip.save();
+
+    // Remove user from Trip Chat
+    await Chat.findOneAndUpdate(
+      { tripId: trip._id },
+      { $pull: { users: userId } }
+    );
 
     return res.status(200).json({ message: "Collaborator removed successfully" });
   } catch (error) {
