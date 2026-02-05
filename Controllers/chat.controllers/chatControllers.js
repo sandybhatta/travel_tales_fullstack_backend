@@ -1,5 +1,6 @@
 import User from "../../models/User.js";
 import Chat from "../../models/Chat.js";
+import Message from "../../models/Message.js";
 
 const accessChat = async (req, res) => {
   const { userId } = req.body;
@@ -57,10 +58,22 @@ const fetchChats = async (req, res) => {
 
     results = await User.populate(results, {
       path: "latestMessage.sender",
-      select: "name pic email",
+      select: "name username avatar email",
     });
-    
-    res.status(200).send(results);
+
+    // Calculate unread count for each chat
+    const chatsWithUnreadCount = await Promise.all(
+      results.map(async (chat) => {
+        const unreadCount = await Message.countDocuments({
+          chat: chat._id,
+          readBy: { $ne: req.user._id },
+          sender: { $ne: req.user._id } // Don't count own messages as unread
+        });
+        return { ...chat.toObject(), unreadCount };
+      })
+    );
+
+    res.status(200).send(chatsWithUnreadCount);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
