@@ -191,7 +191,7 @@ const getUniversalFeed = async (req, res) => {
 
 
     
-    const resultFeed = fullFeed.slice(0, limit);
+    const resultFeed = fullFeed.slice(skip, skip + limit);
 
     const totalPosts = await Post.countDocuments(postQuery);
     const totalTrips = await Trip.countDocuments(tripQuery);
