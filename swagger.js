@@ -265,7 +265,119 @@ const options = {
             expiresAt: { type: 'string', format: 'date-time' },
             createdAt: { type: 'string', format: 'date-time' }
           }
-        }
+        },
+        Chat: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string', example: '60d0fe4f5311236168a109ce' },
+            chatName: { type: 'string', example: 'Weekend Trip Group' },
+            isGroupChat: { type: 'boolean', default: false },
+            isTripChat: { type: 'boolean', default: false },
+            description: { type: 'string', example: 'Chat for planning the trip.' },
+            chatImage: { type: 'string', example: 'https://example.com/chat-icon.png' },
+            users: { type: 'array', items: { type: 'string', description: 'User ID' } },
+            latestMessage: { type: 'string', description: 'Message ID' },
+            groupAdmin: { type: 'string', description: 'User ID' },
+            coAdmins: { type: 'array', items: { type: 'string', description: 'User ID' } },
+            tripId: { type: 'string', description: 'Trip ID' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' }
+          }
+        },
+        Message: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string', example: '60d0fe4f5311236168a109cf' },
+            sender: { type: 'string', description: 'User ID', example: '60d0fe4f5311236168a109ca' },
+            content: { type: 'string', example: 'Hey everyone!' },
+            chat: { type: 'string', description: 'Chat ID', example: '60d0fe4f5311236168a109ce' },
+            readBy: { type: 'array', items: { type: 'string', description: 'User ID' } },
+            isEdited: { type: 'boolean', default: false },
+            deletedFor: { type: 'array', items: { type: 'string', description: 'User ID' } },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' }
+          }
+        },
+        Notification: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string', example: '60d0fe4f5311236168a109d0' },
+            recipient: { type: 'string', description: 'User ID', example: '60d0fe4f5311236168a109ca' },
+            sender: { type: 'string', description: 'User ID', example: '60d0fe4f5311236168a109cb' },
+            type: { 
+              type: 'string', 
+              enum: [
+                "like_post", "like_trip", "comment_post", "follow", "trip_invite", 
+                "reply_comment", "like_comment", "tagged_in_post", "mention_in_caption", 
+                "mention_in_comment", "new_post_from_following", "new_trip_from_following"
+              ] 
+            },
+            relatedPost: { type: 'string', description: 'Post ID' },
+            relatedTrip: { type: 'string', description: 'Trip ID' },
+            relatedComment: { type: 'string', description: 'Comment ID' },
+            message: { type: 'string', example: 'John liked your post.' },
+            isRead: { type: 'boolean', default: false },
+             createdAt: { type: 'string', format: 'date-time' },
+             updatedAt: { type: 'string', format: 'date-time' }
+           }
+         },
+         Quest: {
+           type: 'object',
+           properties: {
+             _id: { type: 'string', example: '60d0fe4f5311236168a109d1' },
+             title: { type: 'string', example: 'Daily Login' },
+             description: { type: 'string', example: 'Log in every day for a week.' },
+             type: { type: 'string', enum: ["daily", "weekly", "special", "onboarding"] },
+             xpReward: { type: 'number', default: 10 },
+             badgeReward: { type: 'string', description: 'Badge ID' },
+             criteria: {
+               type: 'object',
+               properties: {
+                 action: { type: 'string', enum: ["create_post", "like_post", "create_trip", "comment", "login", "share_trip"] },
+                 count: { type: 'number', default: 1 }
+               }
+             },
+             isActive: { type: 'boolean', default: true },
+             expiresAt: { type: 'string', format: 'date-time' },
+             createdAt: { type: 'string', format: 'date-time' },
+             updatedAt: { type: 'string', format: 'date-time' }
+           }
+         },
+         Badge: {
+           type: 'object',
+           properties: {
+             _id: { type: 'string', example: '60d0fe4f5311236168a109d2' },
+             name: { type: 'string', example: 'Globetrotter' },
+             description: { type: 'string', example: 'Visited 10 countries.' },
+             iconUrl: { type: 'string', example: 'https://example.com/badge.png' },
+             tiers: {
+               type: 'array',
+               items: {
+                 type: 'object',
+                 properties: {
+                   tierName: { type: 'string' },
+                   iconUrl: { type: 'string' },
+                   threshold: { type: 'number' },
+                   xpBonus: { type: 'number' },
+                   effects: { type: 'string' }
+                 }
+               }
+             },
+             category: { type: 'string', enum: ["travel", "social", "content", "special_event"] },
+             rarity: { type: 'string', enum: ["common", "rare", "epic", "legendary"] },
+             criteria: {
+               type: 'object',
+               properties: {
+                 type: { type: 'string', enum: ["country_count", "post_count", "trip_count", "xp_threshold", "manual"] },
+                 threshold: { type: 'number' },
+                 targetValue: { type: 'string' }
+               }
+             },
+             xpBonus: { type: 'number', default: 50 },
+             createdAt: { type: 'string', format: 'date-time' },
+             updatedAt: { type: 'string', format: 'date-time' }
+           }
+         }
       },
     },
     security: [
